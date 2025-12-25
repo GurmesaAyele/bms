@@ -54,7 +54,9 @@ function handleQuickRequest(form) {
         priority: formData.get('priority'),
         hospital: formData.get('hospital'),
         reason: formData.get('reason'),
-        doctorContact: formData.get('doctorContact')
+        doctorContact: formData.get('doctorContact'),
+        emergencyContact: formData.get('emergencyContact'),
+        emergencyReason: formData.get('emergencyReason')
     };
 
     // Validate form
@@ -63,16 +65,48 @@ function handleQuickRequest(form) {
         return;
     }
 
+    // Validate emergency reason if priority is emergency
+    if (requestData.priority === 'emergency' && !requestData.emergencyReason) {
+        showNotification('Emergency justification is required for emergency requests', 'error');
+        return;
+    }
+
     // Show loading state
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting Request...';
     submitBtn.disabled = true;
 
-    // Simulate API call
+    // Step 4: Fill Blood Request Form - COMPLETED
+    // Step 5: Save Request in Database with assigned_hospital_id and status = PENDING
     setTimeout(() => {
         // Generate request ID
         const requestId = 'REQ-2024-' + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+        
+        // Create blood request record with workflow data
+        const bloodRequest = {
+            id: requestId,
+            patientId: 'PT-2024-001',
+            patientName: 'Jane Smith',
+            bloodType: requestData.bloodType,
+            units: parseInt(requestData.units),
+            priority: requestData.priority,
+            assignedHospitalId: requestData.hospital,
+            assignedHospitalName: getHospitalName(requestData.hospital),
+            status: 'PENDING', // Step 5: Status = PENDING
+            reason: requestData.reason,
+            emergencyReason: requestData.emergencyReason,
+            doctorContact: requestData.doctorContact,
+            emergencyContact: requestData.emergencyContact,
+            submittedAt: new Date().toISOString(),
+            lastUpdated: new Date().toISOString()
+        };
+        
+        // Store request in localStorage (simulating database)
+        saveBloodRequest(bloodRequest);
+        
+        // Step 6: Hospital Receives Notification - Simulate notification to hospital
+        notifyHospitalOfRequest(bloodRequest);
         
         // Add new request to timeline
         addNewRequestToTimeline(requestData, requestId);
@@ -84,13 +118,62 @@ function handleQuickRequest(form) {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
         
-        // Show success message
-        showNotification(`Blood request submitted successfully! Request ID: ${requestId}`, 'success');
+        // Show success message with workflow confirmation
+        showNotification(`Blood request submitted successfully! Request ID: ${requestId}. Hospital has been notified.`, 'success');
         
         // Update active requests count
         updateActiveRequestsCount(1);
         
+        // Show workflow status
+        setTimeout(() => {
+            showNotification(`Request sent exclusively to ${bloodRequest.assignedHospitalName}. No other hospital can see this request.`, 'info');
+        }, 2000);
+        
     }, 2000);
+}
+
+function getHospitalName(hospitalId) {
+    const hospitalNames = {
+        'city-general': 'City General Hospital',
+        'metro-medical': 'Metro Medical Center',
+        'regional-hospital': 'Regional Hospital',
+        'community-health': 'Community Health Center'
+    };
+    return hospitalNames[hospitalId] || hospitalId;
+}
+
+function saveBloodRequest(requestData) {
+    // Save to localStorage (simulating database storage)
+    const requests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+    requests.push(requestData);
+    localStorage.setItem('bloodRequests', JSON.stringify(requests));
+    
+    console.log('Blood request saved to database:', requestData);
+}
+
+function notifyHospitalOfRequest(requestData) {
+    // Step 6: Hospital Receives Notification
+    // In a real system, this would send a notification to the hospital dashboard
+    
+    // Simulate hospital notification
+    const hospitalNotification = {
+        type: 'BLOOD_REQUEST',
+        requestId: requestData.id,
+        patientName: requestData.patientName,
+        bloodType: requestData.bloodType,
+        units: requestData.units,
+        priority: requestData.priority,
+        emergencyLevel: requestData.priority === 'emergency',
+        hospitalId: requestData.assignedHospitalId,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Store notification for hospital
+    const hospitalNotifications = JSON.parse(localStorage.getItem('hospitalNotifications') || '[]');
+    hospitalNotifications.push(hospitalNotification);
+    localStorage.setItem('hospitalNotifications', JSON.stringify(hospitalNotifications));
+    
+    console.log('Hospital notification sent:', hospitalNotification);
 }
 
 function addNewRequestToTimeline(requestData, requestId) {
@@ -445,10 +528,11 @@ function searchBloodAvailability() {
         <div class="search-loading">
             <i class="fas fa-spinner fa-spin"></i>
             <p>Searching for ${bloodType} blood in nearby hospitals...</p>
+            <p class="search-criteria">Location: ${location} • Radius: ${radius} km</p>
         </div>
     `;
     
-    // Simulate search results
+    // Simulate search with workflow rules
     setTimeout(() => {
         displaySearchResults(bloodType, location, radius);
     }, 2000);
@@ -457,15 +541,18 @@ function searchBloodAvailability() {
 function displaySearchResults(bloodType, location, radius) {
     const resultsContainer = document.getElementById('searchResults');
     
-    // Mock search results based on search parameters
-    const searchResults = [
+    // Mock search results with workflow filtering (ACTIVE, VERIFIED, sufficient stock)
+    const allHospitals = [
         {
             hospital: 'City General Hospital',
             distance: '2.3 km',
             availability: 45,
             status: 'available',
             phone: '+1 (555) 123-4567',
-            address: '123 Medical Center Dr'
+            address: '123 Medical Center Dr',
+            isActive: true,
+            isVerified: true,
+            hospitalId: 'city-general'
         },
         {
             hospital: 'Metro Medical Center',
@@ -473,7 +560,10 @@ function displaySearchResults(bloodType, location, radius) {
             availability: 12,
             status: 'low',
             phone: '+1 (555) 987-6543',
-            address: '456 Health Ave'
+            address: '456 Health Ave',
+            isActive: true,
+            isVerified: true,
+            hospitalId: 'metro-medical'
         },
         {
             hospital: 'Regional Hospital',
@@ -481,18 +571,57 @@ function displaySearchResults(bloodType, location, radius) {
             availability: 0,
             status: 'unavailable',
             phone: '+1 (555) 456-7890',
-            address: '789 Care Blvd'
+            address: '789 Care Blvd',
+            isActive: true,
+            isVerified: true,
+            hospitalId: 'regional-hospital'
+        },
+        {
+            hospital: 'Community Health Center',
+            distance: '8.2 km',
+            availability: 8,
+            status: 'low',
+            phone: '+1 (555) 321-9876',
+            address: '321 Community St',
+            isActive: false, // Not active - should be filtered out
+            isVerified: true,
+            hospitalId: 'community-health'
+        },
+        {
+            hospital: 'Private Clinic',
+            distance: '3.5 km',
+            availability: 25,
+            status: 'available',
+            phone: '+1 (555) 555-5555',
+            address: '555 Private Ave',
+            isActive: true,
+            isVerified: false, // Not verified - should be filtered out
+            hospitalId: 'private-clinic'
         }
     ];
+    
+    // Apply workflow filtering: Only ACTIVE, VERIFIED hospitals with sufficient stock
+    const searchResults = allHospitals.filter(hospital => 
+        hospital.isActive && hospital.isVerified && hospital.availability > 0
+    );
+    
+    const unavailableHospitals = allHospitals.filter(hospital => 
+        hospital.isActive && hospital.isVerified && hospital.availability === 0
+    );
     
     resultsContainer.innerHTML = `
         <div class="search-results-header">
             <h4>Search Results for ${bloodType} Blood</h4>
-            <p>Found ${searchResults.filter(r => r.availability > 0).length} hospitals with available blood</p>
+            <p>Found ${searchResults.length} verified hospitals with available blood</p>
+            <div class="search-filters-applied">
+                <span class="filter-badge">✓ Active Hospitals</span>
+                <span class="filter-badge">✓ Verified Blood Banks</span>
+                <span class="filter-badge">✓ Sufficient Stock</span>
+            </div>
         </div>
         <div class="results-list">
             ${searchResults.map(result => `
-                <div class="result-item ${result.status}">
+                <div class="result-item ${result.status}" data-hospital-id="${result.hospitalId}">
                     <div class="result-header">
                         <div class="hospital-icon">
                             <i class="fas fa-hospital"></i>
@@ -504,24 +633,25 @@ function displaySearchResults(bloodType, location, radius) {
                                 <i class="fas fa-map-marker-alt"></i>
                                 ${result.distance}
                             </span>
+                            <div class="hospital-badges">
+                                <span class="badge verified">✓ Verified</span>
+                                <span class="badge active">✓ Active</span>
+                            </div>
                         </div>
                         <div class="availability-info">
                             <div class="availability-count ${result.status}">
                                 ${result.availability} units
                             </div>
                             <div class="availability-status ${result.status}">
-                                ${result.status === 'available' ? 'Available' : 
-                                  result.status === 'low' ? 'Low Stock' : 'Unavailable'}
+                                ${result.status === 'available' ? 'Available' : 'Low Stock'}
                             </div>
                         </div>
                     </div>
                     <div class="result-actions">
-                        ${result.availability > 0 ? `
-                            <button class="btn-sm primary" onclick="requestFromHospital('${result.hospital}', '${bloodType}')">
-                                <i class="fas fa-hand-holding-medical"></i>
-                                Request Blood
-                            </button>
-                        ` : ''}
+                        <button class="btn-sm primary" onclick="selectHospitalForRequest('${result.hospitalId}', '${result.hospital}', '${bloodType}')">
+                            <i class="fas fa-hand-holding-medical"></i>
+                            Select Hospital
+                        </button>
                         <button class="btn-sm secondary" onclick="callHospital('${result.phone}')">
                             <i class="fas fa-phone"></i>
                             Call Hospital
@@ -533,19 +663,82 @@ function displaySearchResults(bloodType, location, radius) {
                     </div>
                 </div>
             `).join('')}
+            
+            ${unavailableHospitals.length > 0 ? `
+                <div class="unavailable-hospitals">
+                    <h5>Verified Hospitals Currently Out of Stock</h5>
+                    ${unavailableHospitals.map(result => `
+                        <div class="result-item unavailable" data-hospital-id="${result.hospitalId}">
+                            <div class="result-header">
+                                <div class="hospital-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div class="hospital-info">
+                                    <h5>${result.hospital}</h5>
+                                    <p>${result.address}</p>
+                                    <span class="distance">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        ${result.distance}
+                                    </span>
+                                </div>
+                                <div class="availability-info">
+                                    <div class="availability-count unavailable">
+                                        0 units
+                                    </div>
+                                    <div class="availability-status unavailable">
+                                        Out of Stock
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn-sm secondary" onclick="callHospital('${result.phone}')">
+                                    <i class="fas fa-phone"></i>
+                                    Call Hospital
+                                </button>
+                                <button class="btn-sm info" onclick="getDirections('${result.address}')">
+                                    <i class="fas fa-directions"></i>
+                                    Directions
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
         </div>
     `;
 }
 
-function requestFromHospital(hospitalName, bloodType) {
-    // Pre-fill the quick request form
+function selectHospitalForRequest(hospitalId, hospitalName, bloodType) {
+    // Step 3: User Selects a Hospital
+    showNotification(`Selected ${hospitalName} for ${bloodType} blood request`, 'info');
+    
+    // Pre-fill the request form with selected hospital and blood type
     document.querySelector('select[name="bloodType"]').value = bloodType;
-    document.querySelector('select[name="hospital"]').value = hospitalName.toLowerCase().replace(/\s+/g, '-');
+    
+    // Update hospital dropdown to show selected hospital
+    const hospitalSelect = document.querySelector('select[name="hospital"]');
+    hospitalSelect.value = hospitalId;
     
     // Scroll to request form
     document.querySelector('.quick-request-section').scrollIntoView({ behavior: 'smooth' });
     
-    showNotification(`Pre-filled request form for ${bloodType} blood at ${hospitalName}`, 'info');
+    // Highlight the form
+    const formSection = document.querySelector('.quick-request-section');
+    formSection.style.border = '3px solid #3b82f6';
+    formSection.style.background = 'rgba(59, 130, 246, 0.02)';
+    
+    setTimeout(() => {
+        formSection.style.border = '1px solid #e5e7eb';
+        formSection.style.background = 'white';
+    }, 3000);
+    
+    showNotification(`Form pre-filled for ${hospitalName}. Please complete the request details.`, 'success');
+}
+
+function requestFromHospital(hospitalName, bloodType) {
+    // Legacy function - redirect to new workflow
+    const hospitalId = hospitalName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    selectHospitalForRequest(hospitalId, hospitalName, bloodType);
 }
 
 function callHospital(phone) {
@@ -953,6 +1146,236 @@ function updateActiveRequestsCount(change) {
         badge.textContent = `${newCount} active request${newCount !== 1 ? 's' : ''}`;
     }
 }
+
+// Blood Request Workflow Functions
+function simulateHospitalResponse(requestId, response) {
+    // Step 7: Hospital Reviews Request
+    // Step 8A: Hospital ACCEPTS or Step 8B: Hospital REJECTS
+    
+    const requests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+    const requestIndex = requests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) return;
+    
+    const request = requests[requestIndex];
+    
+    if (response === 'APPROVED') {
+        // Step 8A: Hospital ACCEPTS
+        request.status = 'APPROVED';
+        request.approvedAt = new Date().toISOString();
+        request.lastUpdated = new Date().toISOString();
+        
+        // Blood reserved for patient
+        showNotification(`Great news! ${request.assignedHospitalName} has APPROVED your blood request ${requestId}. Blood has been reserved for you.`, 'success');
+        
+        // Update UI
+        updateRequestStatusInUI(requestId, 'APPROVED');
+        
+    } else if (response === 'REJECTED') {
+        // Step 8B: Hospital REJECTS
+        request.status = 'REJECTED';
+        request.rejectedAt = new Date().toISOString();
+        request.rejectionReason = 'Insufficient stock available';
+        request.lastUpdated = new Date().toISOString();
+        
+        // Patient notified with reason
+        showNotification(`${request.assignedHospitalName} has rejected your blood request ${requestId}. Reason: ${request.rejectionReason}`, 'warning');
+        
+        // Show options for patient
+        setTimeout(() => {
+            showRejectionOptionsModal(requestId, request);
+        }, 2000);
+        
+        // Update UI
+        updateRequestStatusInUI(requestId, 'REJECTED');
+    }
+    
+    // Update stored request
+    requests[requestIndex] = request;
+    localStorage.setItem('bloodRequests', JSON.stringify(requests));
+}
+
+function showRejectionOptionsModal(requestId, request) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Request Rejected - What's Next?</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="rejection-info">
+                    <p><strong>Request ID:</strong> ${requestId}</p>
+                    <p><strong>Hospital:</strong> ${request.assignedHospitalName}</p>
+                    <p><strong>Reason:</strong> ${request.rejectionReason}</p>
+                </div>
+                <div class="next-steps">
+                    <h4>Your Options:</h4>
+                    <div class="option-buttons">
+                        <button class="btn btn-primary" onclick="selectAnotherHospital('${requestId}', '${request.bloodType}')">
+                            <i class="fas fa-hospital"></i>
+                            Select Another Hospital
+                        </button>
+                        <button class="btn btn-secondary" onclick="submitNewRequest('${request.bloodType}', '${request.units}')">
+                            <i class="fas fa-plus"></i>
+                            Submit New Request
+                        </button>
+                        <button class="btn btn-info" onclick="searchAlternatives('${request.bloodType}')">
+                            <i class="fas fa-search"></i>
+                            Search Alternatives
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Close</button>
+            </div>
+        </div>
+    `;
+    
+    showModal(modal);
+}
+
+function selectAnotherHospital(requestId, bloodType) {
+    // Close modal
+    document.querySelector('.modal-overlay').remove();
+    
+    // Trigger search for available hospitals
+    document.getElementById('searchBloodType').value = bloodType;
+    searchBloodAvailability();
+    
+    // Scroll to search results
+    setTimeout(() => {
+        document.querySelector('.blood-search-section').scrollIntoView({ behavior: 'smooth' });
+    }, 2500);
+    
+    showNotification('Searching for alternative hospitals with available blood...', 'info');
+}
+
+function submitNewRequest(bloodType, units) {
+    // Close modal
+    document.querySelector('.modal-overlay').remove();
+    
+    // Pre-fill form for new request
+    document.querySelector('select[name="bloodType"]').value = bloodType;
+    document.querySelector('select[name="units"]').value = units;
+    
+    // Scroll to request form
+    document.querySelector('.quick-request-section').scrollIntoView({ behavior: 'smooth' });
+    
+    showNotification('Form pre-filled for new blood request', 'info');
+}
+
+function searchAlternatives(bloodType) {
+    // Close modal
+    document.querySelector('.modal-overlay').remove();
+    
+    // Trigger search
+    document.getElementById('searchBloodType').value = bloodType;
+    searchBloodAvailability();
+    
+    showNotification('Searching for alternative blood sources...', 'info');
+}
+
+function updateRequestStatusInUI(requestId, status) {
+    // Find and update the request item in the timeline
+    const requestItems = document.querySelectorAll('.request-item');
+    
+    requestItems.forEach(item => {
+        const itemRequestId = item.querySelector('.request-id').textContent;
+        if (itemRequestId === `#${requestId}`) {
+            const statusIndicator = item.querySelector('.request-status-indicator');
+            const progressFill = item.querySelector('.progress-fill');
+            const progressSteps = item.querySelectorAll('.progress-steps .step');
+            
+            if (status === 'APPROVED') {
+                statusIndicator.className = 'request-status-indicator approved';
+                statusIndicator.innerHTML = '<i class="fas fa-check"></i>';
+                progressFill.style.width = '75%';
+                
+                // Update progress steps
+                progressSteps.forEach((step, index) => {
+                    step.classList.remove('active');
+                    if (index < 3) {
+                        step.classList.add('completed');
+                    } else if (index === 2) {
+                        step.classList.add('active');
+                    }
+                });
+                
+            } else if (status === 'REJECTED') {
+                statusIndicator.className = 'request-status-indicator rejected';
+                statusIndicator.innerHTML = '<i class="fas fa-times"></i>';
+                progressFill.style.background = '#ef4444';
+                progressFill.style.width = '50%';
+                
+                // Update actions
+                const actions = item.querySelector('.request-actions');
+                actions.innerHTML = `
+                    <button class="btn-sm warning" onclick="selectAnotherHospital('${requestId}', 'A+')">
+                        <i class="fas fa-hospital"></i>
+                        Try Another Hospital
+                    </button>
+                    <button class="btn-sm secondary" onclick="submitNewRequest('A+', '2')">
+                        <i class="fas fa-plus"></i>
+                        New Request
+                    </button>
+                `;
+            }
+        }
+    });
+}
+
+// Simulate hospital responses for demo
+function simulateWorkflowDemo() {
+    // Simulate hospital responses after some time
+    setTimeout(() => {
+        const requests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+        if (requests.length > 0) {
+            const latestRequest = requests[requests.length - 1];
+            
+            // 70% chance of approval, 30% chance of rejection
+            const response = Math.random() < 0.7 ? 'APPROVED' : 'REJECTED';
+            simulateHospitalResponse(latestRequest.id, response);
+        }
+    }, 10000); // Simulate response after 10 seconds
+}
+
+// Step 9: Blood Collection - Simulate patient visiting hospital
+function simulateBloodCollection(requestId) {
+    const requests = JSON.parse(localStorage.getItem('bloodRequests') || '[]');
+    const requestIndex = requests.findIndex(r => r.id === requestId);
+    
+    if (requestIndex === -1) return;
+    
+    const request = requests[requestIndex];
+    
+    if (request.status === 'APPROVED') {
+        // Patient visits hospital, blood is issued
+        request.status = 'COMPLETED';
+        request.completedAt = new Date().toISOString();
+        request.lastUpdated = new Date().toISOString();
+        
+        // Update stored request
+        requests[requestIndex] = request;
+        localStorage.setItem('bloodRequests', JSON.stringify(requests));
+        
+        // Step 10: Request Completion - Hospital marks as completed, stock reduced
+        showNotification(`Blood collection completed at ${request.assignedHospitalName}. Request ${requestId} is now fulfilled.`, 'success');
+        
+        // Update UI to show completion
+        updateRequestStatusInUI(requestId, 'COMPLETED');
+    }
+}
+
+// Initialize workflow demo
+document.addEventListener('DOMContentLoaded', function() {
+    // Start workflow simulation
+    simulateWorkflowDemo();
+});
 
 function downloadReceipt(requestId) {
     showNotification(`Downloading receipt for ${requestId}...`, 'info');
@@ -1590,6 +2013,12 @@ const patientStyles = `
         color: #3b82f6;
     }
 
+    .search-criteria {
+        font-size: 0.875rem;
+        color: #9ca3af;
+        margin-top: 0.5rem;
+    }
+
     .search-results-header {
         margin-bottom: 1.5rem;
         padding-bottom: 1rem;
@@ -1599,6 +2028,161 @@ const patientStyles = `
     .search-results-header h4 {
         margin-bottom: 0.5rem;
         color: #1f2937;
+    }
+
+    .search-filters-applied {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-badge {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .hospital-badges {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .badge.verified {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .unavailable-hospitals {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .unavailable-hospitals h5 {
+        color: #6b7280;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    /* Request Status Indicators */
+    .request-status-indicator.rejected {
+        background: #ef4444;
+    }
+
+    /* Rejection Options Modal */
+    .rejection-info {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .rejection-info p {
+        margin-bottom: 0.5rem;
+        color: #7f1d1d;
+    }
+
+    .rejection-info p:last-child {
+        margin-bottom: 0;
+    }
+
+    .next-steps h4 {
+        margin-bottom: 1rem;
+        color: #1f2937;
+    }
+
+    .option-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .option-buttons .btn {
+        justify-content: flex-start;
+        text-align: left;
+    }
+
+    .option-buttons .btn i {
+        margin-right: 0.75rem;
+        width: 20px;
+    }
+
+    /* Workflow Status Updates */
+    .progress-steps .step.cancelled {
+        color: #ef4444;
+        text-decoration: line-through;
+    }
+
+    /* Emergency Request Enhancements */
+    .form-help.emergency-warning {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid #fbbf24;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        color: #92400e;
+        font-size: 0.875rem;
+    }
+
+    /* Enhanced Result Items */
+    .result-item[data-hospital-id] {
+        position: relative;
+    }
+
+    .result-item[data-hospital-id]:hover {
+        border-color: #3b82f6;
+    }
+
+    .result-item.selected {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.02);
+    }
+
+    /* Request Timeline Enhancements */
+    .request-item.workflow-active {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.02);
+    }
+
+    .request-item .workflow-status {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    /* Mobile Responsiveness for Workflow */
+    @media (max-width: 768px) {
+        .option-buttons {
+            gap: 0.75rem;
+        }
+        
+        .search-filters-applied {
+            justify-content: center;
+        }
+        
+        .hospital-badges {
+            justify-content: center;
+        }
     }
 
     .results-list {

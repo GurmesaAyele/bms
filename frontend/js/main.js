@@ -855,3 +855,708 @@ function initializeBloodDropParticles() {
 
 // Initialize particles
 setTimeout(initializeBloodDropParticles, 2000);
+// Ultra-Compact Layout Functions
+function scrollToOptions() {
+    const element = document.getElementById('options');
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+function scrollToEligibility() {
+    const element = document.getElementById('eligibility');
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+function scrollToAvailability() {
+    const element = document.getElementById('availability');
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+// Ultra-Compact Availability Results
+function displayCompactAvailabilityResults(results) {
+    const resultsContainer = document.getElementById('availabilityResults');
+    
+    if (!results || results.hospitals.length === 0) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; padding: var(--spacing-2); color: var(--gray-600); font-size: 11px;">
+                No results found. Try different criteria.
+            </div>
+        `;
+        return;
+    }
+    
+    resultsContainer.innerHTML = `
+        <div style="font-size: 11px; font-weight: 600; margin-bottom: var(--spacing-1); color: var(--gray-900);">
+            Found ${results.totalUnits} units of ${results.bloodType}
+        </div>
+        ${results.hospitals.slice(0, 3).map(hospital => `
+            <div class="hospital-result-mini">
+                <div class="hospital-info-mini">
+                    <h4>${hospital.name}</h4>
+                    <p>${hospital.distance}</p>
+                </div>
+                <div class="hospital-availability-mini">
+                    <div class="units-available-mini">${hospital.units}</div>
+                    <div class="units-label-mini">units</div>
+                    <div class="availability-status-mini ${hospital.status}">
+                        ${hospital.status === 'available' ? 'Available' : 
+                          hospital.status === 'low' ? 'Low' : 'Critical'}
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    `;
+}
+
+// Enhanced checkAvailability function for compact layout
+window.checkAvailability = function() {
+    const bloodType = document.getElementById('checkBloodType').value;
+    const location = document.getElementById('checkLocation').value;
+    const resultsContainer = document.getElementById('availabilityResults');
+    
+    if (!bloodType || !location) {
+        resultsContainer.innerHTML = `
+            <div style="text-align: center; padding: var(--spacing-2); color: var(--danger-color); font-size: 11px;">
+                Please select blood type and enter location
+            </div>
+        `;
+        return;
+    }
+    
+    // Show loading state
+    resultsContainer.innerHTML = `
+        <div style="text-align: center; padding: var(--spacing-2); color: var(--gray-600); font-size: 11px;">
+            <i class="fas fa-spinner fa-spin"></i> Checking...
+        </div>
+    `;
+    
+    // Simulate API call
+    setTimeout(() => {
+        const mockResults = {
+            bloodType,
+            location,
+            totalUnits: Math.floor(Math.random() * 50) + 10,
+            hospitals: [
+                { name: 'City General', distance: '2.3 mi', units: Math.floor(Math.random() * 20) + 5, status: 'available' },
+                { name: 'Memorial Medical', distance: '4.7 mi', units: Math.floor(Math.random() * 15) + 3, status: 'available' },
+                { name: 'Regional Blood Bank', distance: '6.1 mi', units: Math.floor(Math.random() * 10) + 2, status: 'low' }
+            ]
+        };
+        displayCompactAvailabilityResults(mockResults);
+    }, 1500);
+};
+
+// Enhanced eligibility checker for compact layout
+window.checkEligibility = function() {
+    const form = document.getElementById('eligibilityForm');
+    const resultDiv = document.getElementById('eligibilityResult');
+    
+    if (!form || !resultDiv) return;
+    
+    const formData = new FormData(form);
+    const age = formData.get('age');
+    const weight = formData.get('weight');
+    const health = formData.get('health');
+    
+    if (!age || !weight || !health) {
+        showNotification('Please answer all questions', 'error');
+        return;
+    }
+    
+    let eligible = true;
+    let message = '';
+    
+    if (age === 'under-17' || age === 'over-65') {
+        eligible = false;
+        message = 'Age requirements: 17-65 years old';
+    } else if (weight === 'under-50') {
+        eligible = false;
+        message = 'Weight requirement: minimum 50kg';
+    } else if (health === 'issues') {
+        eligible = false;
+        message = 'Health screening required';
+    } else {
+        message = 'You meet the basic requirements!';
+    }
+    
+    resultDiv.className = `eligibility-result ${eligible ? 'eligible' : 'not-eligible'}`;
+    resultDiv.innerHTML = `
+        <h3>${eligible ? '✓ Eligible' : '✗ Not Eligible'}</h3>
+        <p>${message}</p>
+        ${eligible ? `
+            <a href="auth/register.html" class="btn btn-primary" style="margin-top: var(--spacing-2);">
+                <i class="fas fa-heart"></i> Register Now
+            </a>
+        ` : ''}
+    `;
+    resultDiv.style.display = 'block';
+};
+
+// Initialize ultra-compact features
+document.addEventListener('DOMContentLoaded', function() {
+    // Add ultra-compact class to body for specific styling
+    document.body.classList.add('ultra-compact');
+    
+    // Initialize compact counters with faster animation
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target')) || parseInt(counter.textContent);
+        const duration = 1000; // Faster animation
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+        
+        // Start animation when element is visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateCounter();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+        
+        observer.observe(counter);
+    });
+});
+// Index Page Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+        initializeIndexPage();
+    }
+});
+
+function initializeIndexPage() {
+    // Initialize blood availability
+    initializeBloodAvailability();
+    
+    // Initialize hospitals section
+    initializeHospitalsSection();
+    
+    // Initialize filters
+    initializeFilters();
+    
+    // Update last updated time
+    updateLastUpdatedTime();
+    
+    // Set up auto-refresh
+    setInterval(refreshBloodData, 300000); // Refresh every 5 minutes
+}
+
+// Blood Availability Functions
+function initializeBloodAvailability() {
+    // Simulate real-time data updates
+    updateBloodAvailability();
+    
+    // Add click handlers for blood type cards
+    const bloodCards = document.querySelectorAll('.blood-type-card');
+    bloodCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const bloodType = this.dataset.type;
+            showBloodTypeDetails(bloodType);
+        });
+    });
+}
+
+function updateBloodAvailability() {
+    // Simulate fetching data from database
+    const bloodData = {
+        'A+': { units: Math.floor(Math.random() * 30) + 15, donors: Math.floor(Math.random() * 100) + 120 },
+        'O+': { units: Math.floor(Math.random() * 25) + 10, donors: Math.floor(Math.random() * 150) + 180 },
+        'B+': { units: Math.floor(Math.random() * 20) + 5, donors: Math.floor(Math.random() * 80) + 60 },
+        'AB+': { units: Math.floor(Math.random() * 15) + 3, donors: Math.floor(Math.random() * 50) + 20 },
+        'A-': { units: Math.floor(Math.random() * 20) + 8, donors: Math.floor(Math.random() * 70) + 50 },
+        'O-': { units: Math.floor(Math.random() * 12) + 2, donors: Math.floor(Math.random() * 60) + 30 },
+        'B-': { units: Math.floor(Math.random() * 15) + 4, donors: Math.floor(Math.random() * 50) + 25 },
+        'AB-': { units: Math.floor(Math.random() * 10) + 1, donors: Math.floor(Math.random() * 30) + 15 }
+    };
+
+    // Update the UI
+    Object.keys(bloodData).forEach(bloodType => {
+        const data = bloodData[bloodType];
+        const typeKey = bloodType.toLowerCase().replace('+', '-plus').replace('-', '-minus');
+        
+        // Update units count
+        const unitsElement = document.getElementById(`${typeKey}-count`);
+        if (unitsElement) {
+            animateNumber(unitsElement, parseInt(unitsElement.textContent), data.units);
+        }
+        
+        // Update donors count
+        const donorsElement = document.getElementById(`${typeKey}-donors`);
+        if (donorsElement) {
+            animateNumber(donorsElement, parseInt(donorsElement.textContent), data.donors);
+        }
+        
+        // Update status
+        const card = document.querySelector(`[data-type="${bloodType}"]`);
+        if (card) {
+            const statusElement = card.querySelector('.availability-status');
+            updateAvailabilityStatus(statusElement, data.units);
+        }
+    });
+}
+
+function updateAvailabilityStatus(statusElement, units) {
+    statusElement.classList.remove('available', 'low', 'critical');
+    
+    if (units >= 15) {
+        statusElement.classList.add('available');
+        statusElement.innerHTML = '<i class="fas fa-check-circle"></i><span>Available</span>';
+    } else if (units >= 8) {
+        statusElement.classList.add('low');
+        statusElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span>Low Stock</span>';
+    } else {
+        statusElement.classList.add('critical');
+        statusElement.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Critical</span>';
+    }
+}
+
+function animateNumber(element, start, end) {
+    const duration = 1000;
+    const startTime = performance.now();
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const current = Math.floor(start + (end - start) * progress);
+        element.textContent = current;
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+function refreshBloodData() {
+    // Show loading state
+    const refreshBtn = document.querySelector('button[onclick="refreshBloodData()"]');
+    if (refreshBtn) {
+        const originalText = refreshBtn.innerHTML;
+        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+        refreshBtn.disabled = true;
+        
+        setTimeout(() => {
+            updateBloodAvailability();
+            updateLastUpdatedTime();
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+            showNotification('Blood availability data updated successfully!', 'success');
+        }, 2000);
+    }
+}
+
+function updateLastUpdatedTime() {
+    const lastUpdatedElement = document.getElementById('lastUpdated');
+    if (lastUpdatedElement) {
+        const now = new Date();
+        lastUpdatedElement.textContent = now.toLocaleTimeString();
+    }
+}
+
+function showBloodTypeDetails(bloodType) {
+    // Create modal with blood type details
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content-modern">
+            <div class="modal-header-modern">
+                <h3>Blood Type ${bloodType} Details</h3>
+                <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body-modern">
+                <div class="blood-type-details">
+                    <div class="detail-section">
+                        <h4>Compatibility</h4>
+                        <p><strong>Can donate to:</strong> ${getCompatibleRecipients(bloodType)}</p>
+                        <p><strong>Can receive from:</strong> ${getCompatibleDonors(bloodType)}</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>Current Status</h4>
+                        <p>We have sufficient ${bloodType} blood available for immediate use.</p>
+                    </div>
+                    <div class="detail-section">
+                        <h4>How to Help</h4>
+                        <p>If you have ${bloodType} blood type, consider becoming a regular donor to help maintain our supply.</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <a href="become-donor.html" class="btn btn-primary">Become a Donor</a>
+                    <a href="request-blood.html" class="btn btn-secondary">Request Blood</a>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+function getCompatibleRecipients(bloodType) {
+    const compatibility = {
+        'A+': 'A+, AB+',
+        'A-': 'A+, A-, AB+, AB-',
+        'B+': 'B+, AB+',
+        'B-': 'B+, B-, AB+, AB-',
+        'AB+': 'AB+',
+        'AB-': 'AB+, AB-',
+        'O+': 'A+, B+, AB+, O+',
+        'O-': 'All blood types (Universal donor)'
+    };
+    return compatibility[bloodType] || 'Unknown';
+}
+
+function getCompatibleDonors(bloodType) {
+    const compatibility = {
+        'A+': 'A+, A-, O+, O-',
+        'A-': 'A-, O-',
+        'B+': 'B+, B-, O+, O-',
+        'B-': 'B-, O-',
+        'AB+': 'All blood types (Universal recipient)',
+        'AB-': 'AB-, A-, B-, O-',
+        'O+': 'O+, O-',
+        'O-': 'O-'
+    };
+    return compatibility[bloodType] || 'Unknown';
+}
+
+// Hospitals Section Functions
+function initializeHospitalsSection() {
+    loadHospitals();
+}
+
+function loadHospitals(filter = 'all') {
+    const hospitalsGrid = document.getElementById('hospitalsGrid');
+    
+    // Show loading state
+    hospitalsGrid.innerHTML = `
+        <div class="loading-hospitals">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading hospitals...</p>
+        </div>
+    `;
+    
+    // Simulate API call
+    setTimeout(() => {
+        const hospitals = generateHospitalData(filter);
+        displayHospitals(hospitals);
+    }, 1500);
+}
+
+function generateHospitalData(filter) {
+    const hospitalTypes = ['general', 'specialty', 'trauma', 'blood-bank'];
+    const hospitalNames = [
+        'City General Hospital',
+        'Metropolitan Medical Center',
+        'St. Mary\'s Hospital',
+        'Regional Trauma Center',
+        'University Hospital',
+        'Community Health Center',
+        'Children\'s Hospital',
+        'Heart & Vascular Institute',
+        'Cancer Treatment Center',
+        'Emergency Medical Center'
+    ];
+    
+    const services = [
+        'Emergency Care', 'Surgery', 'ICU', 'Blood Bank', 'Laboratory',
+        'Radiology', 'Cardiology', 'Oncology', 'Pediatrics', 'Maternity'
+    ];
+    
+    const hospitals = [];
+    
+    for (let i = 0; i < 12; i++) {
+        const type = hospitalTypes[Math.floor(Math.random() * hospitalTypes.length)];
+        
+        if (filter !== 'all' && type !== filter) continue;
+        
+        const hospital = {
+            id: i + 1,
+            name: hospitalNames[i % hospitalNames.length],
+            type: type,
+            rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
+            reviews: Math.floor(Math.random() * 500) + 50,
+            address: `${Math.floor(Math.random() * 9999) + 1000} Medical Drive`,
+            city: 'Healthcare City',
+            phone: `(555) ${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`,
+            beds: Math.floor(Math.random() * 300) + 50,
+            services: services.slice(0, Math.floor(Math.random() * 5) + 3),
+            bloodBank: Math.random() > 0.3,
+            emergency: Math.random() > 0.2,
+            verified: Math.random() > 0.1
+        };
+        
+        hospitals.push(hospital);
+    }
+    
+    return hospitals.sort((a, b) => b.rating - a.rating);
+}
+
+function displayHospitals(hospitals) {
+    const hospitalsGrid = document.getElementById('hospitalsGrid');
+    
+    if (hospitals.length === 0) {
+        hospitalsGrid.innerHTML = `
+            <div class="loading-hospitals">
+                <i class="fas fa-hospital"></i>
+                <p>No hospitals found for this category.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    hospitalsGrid.innerHTML = hospitals.map(hospital => `
+        <div class="hospital-card" data-type="${hospital.type}">
+            <div class="hospital-header">
+                <div class="hospital-logo">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <div class="hospital-info">
+                    <h3>${hospital.name}</h3>
+                    <span class="hospital-type">${formatHospitalType(hospital.type)}</span>
+                </div>
+            </div>
+            
+            <div class="hospital-rating">
+                <div class="stars">
+                    ${generateStars(hospital.rating)}
+                </div>
+                <span class="rating-text">${hospital.rating} (${hospital.reviews} reviews)</span>
+            </div>
+            
+            <div class="hospital-details">
+                <div class="detail-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${hospital.address}, ${hospital.city}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-phone"></i>
+                    <span>${hospital.phone}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-bed"></i>
+                    <span>${hospital.beds} beds</span>
+                </div>
+                ${hospital.emergency ? '<div class="detail-item"><i class="fas fa-ambulance"></i><span>24/7 Emergency</span></div>' : ''}
+                ${hospital.bloodBank ? '<div class="detail-item"><i class="fas fa-tint"></i><span>Blood Bank Available</span></div>' : ''}
+            </div>
+            
+            <div class="hospital-services">
+                ${hospital.services.slice(0, 3).map(service => `<span class="service-tag">${service}</span>`).join('')}
+                ${hospital.services.length > 3 ? `<span class="service-tag">+${hospital.services.length - 3} more</span>` : ''}
+            </div>
+            
+            <div class="hospital-actions">
+                <button class="btn btn-primary btn-sm" onclick="contactHospital(${hospital.id})">
+                    <i class="fas fa-phone"></i> Contact
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="viewHospitalDetails(${hospital.id})">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+                ${hospital.bloodBank ? '<button class="btn btn-outline-primary btn-sm" onclick="requestBloodFromHospital(' + hospital.id + ')"><i class="fas fa-tint"></i> Request Blood</button>' : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function formatHospitalType(type) {
+    const types = {
+        'general': 'General Hospital',
+        'specialty': 'Specialty Hospital',
+        'trauma': 'Trauma Center',
+        'blood-bank': 'Blood Bank'
+    };
+    return types[type] || type;
+}
+
+function generateStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    
+    let stars = '';
+    
+    for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star star"></i>';
+    }
+    
+    if (hasHalfStar) {
+        stars += '<i class="fas fa-star-half-alt star"></i>';
+    }
+    
+    for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star star empty"></i>';
+    }
+    
+    return stars;
+}
+
+function initializeFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Load hospitals with filter
+            const filter = this.dataset.filter;
+            loadHospitals(filter);
+        });
+    });
+}
+
+function loadMoreHospitals() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        // Simulate loading more hospitals
+        const currentHospitals = document.querySelectorAll('.hospital-card').length;
+        const additionalHospitals = generateHospitalData('all').slice(0, 6);
+        
+        const hospitalsGrid = document.getElementById('hospitalsGrid');
+        additionalHospitals.forEach(hospital => {
+            const hospitalCard = document.createElement('div');
+            hospitalCard.className = 'hospital-card';
+            hospitalCard.innerHTML = `
+                <div class="hospital-header">
+                    <div class="hospital-logo">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <div class="hospital-info">
+                        <h3>${hospital.name}</h3>
+                        <span class="hospital-type">${formatHospitalType(hospital.type)}</span>
+                    </div>
+                </div>
+                <!-- Add rest of hospital card content -->
+            `;
+            hospitalsGrid.appendChild(hospitalCard);
+        });
+        
+        button.innerHTML = originalText;
+        button.disabled = false;
+        
+        showNotification(`Loaded ${additionalHospitals.length} more hospitals`, 'success');
+    }, 1500);
+}
+
+function contactHospital(hospitalId) {
+    showNotification('Opening contact information...', 'info');
+    // In a real app, this would open contact details or initiate a call
+}
+
+function viewHospitalDetails(hospitalId) {
+    showNotification('Loading hospital details...', 'info');
+    // In a real app, this would navigate to a detailed hospital page
+}
+
+function requestBloodFromHospital(hospitalId) {
+    showNotification('Redirecting to blood request form...', 'info');
+    setTimeout(() => {
+        window.location.href = 'request-blood.html';
+    }, 1000);
+}
+
+// Notification function (if not already defined)
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${getNotificationColor(type)};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        z-index: 10001;
+        max-width: 400px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'exclamation-circle';
+        case 'warning': return 'exclamation-triangle';
+        default: return 'info-circle';
+    }
+}
+
+function getNotificationColor(type) {
+    switch (type) {
+        case 'success': return '#10b981';
+        case 'error': return '#ef4444';
+        case 'warning': return '#f59e0b';
+        default: return '#3b82f6';
+    }
+}

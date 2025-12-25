@@ -758,3 +758,421 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notif.remove(), 300);
     }
 }
+// Multi-step Form Functionality
+let currentStep = 1;
+let totalSteps = 3;
+
+function nextStep() {
+    if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateFormStep();
+        }
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        updateFormStep();
+    }
+}
+
+function updateFormStep() {
+    // Update progress indicator
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const formSteps = document.querySelectorAll('.form-step');
+    
+    progressSteps.forEach((step, index) => {
+        if (index + 1 <= currentStep) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+    
+    // Update form steps
+    formSteps.forEach((step, index) => {
+        if (index + 1 === currentStep) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+    
+    // Scroll to top of form
+    const authCard = document.querySelector('.auth-card-modern');
+    if (authCard) {
+        authCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function validateCurrentStep() {
+    const currentFormStep = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    if (!currentFormStep) return false;
+    
+    const requiredFields = currentFormStep.querySelectorAll('input[required], select[required], textarea[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add('error');
+            isValid = false;
+            
+            // Remove error class after user starts typing
+            field.addEventListener('input', function() {
+                this.classList.remove('error');
+            }, { once: true });
+        } else {
+            field.classList.remove('error');
+        }
+    });
+    
+    // Additional validation for specific steps
+    if (currentStep === 3) {
+        // Password confirmation validation
+        const password = currentFormStep.querySelector('#password');
+        const confirmPassword = currentFormStep.querySelector('#confirmPassword');
+        
+        if (password && confirmPassword) {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.classList.add('error');
+                showNotification('Passwords do not match', 'error');
+                isValid = false;
+            }
+        }
+        
+        // Terms checkbox validation
+        const termsCheckbox = currentFormStep.querySelector('input[name="terms"]');
+        if (termsCheckbox && !termsCheckbox.checked) {
+            showNotification('Please accept the terms and conditions', 'error');
+            isValid = false;
+        }
+    }
+    
+    if (!isValid) {
+        showNotification('Please fill in all required fields', 'error');
+    }
+    
+    return isValid;
+}
+
+// Enhanced Password Toggle
+function togglePassword(fieldId) {
+    const passwordField = document.getElementById(fieldId);
+    const toggleButton = passwordField.parentElement.querySelector('.password-toggle-modern');
+    const toggleIcon = toggleButton.querySelector('i');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+// Form Submission Handlers
+function initializeRegistrationForms() {
+    // Donor Registration
+    const donorForm = document.getElementById('donorRegistrationForm');
+    if (donorForm) {
+        donorForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleDonorRegistration(this);
+        });
+    }
+    
+    // Patient Registration
+    const patientForm = document.getElementById('patientRegistrationForm');
+    if (patientForm) {
+        patientForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handlePatientRegistration(this);
+        });
+    }
+    
+    // Hospital Registration
+    const hospitalForm = document.getElementById('hospitalRegistrationForm');
+    if (hospitalForm) {
+        hospitalForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleHospitalRegistration(this);
+        });
+    }
+}
+
+function handleDonorRegistration(form) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.classList.add('loading');
+    submitButton.disabled = true;
+    
+    const formData = new FormData(form);
+    const donorData = {
+        // Personal Info
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        dateOfBirth: formData.get('dateOfBirth'),
+        address: formData.get('address'),
+        city: formData.get('city'),
+        zipCode: formData.get('zipCode'),
+        
+        // Health Info
+        bloodType: formData.get('bloodType'),
+        weight: formData.get('weight'),
+        previousDonation: formData.get('previousDonation'),
+        medicalConditions: formData.get('medicalConditions'),
+        medications: formData.get('medications'),
+        
+        // Account Setup
+        password: formData.get('password'),
+        emergencyContact: formData.get('emergencyContact'),
+        emergencyPhone: formData.get('emergencyPhone'),
+        notifications: formData.get('notifications') === 'on',
+        emergencyAlerts: formData.get('emergencyAlerts') === 'on'
+    };
+    
+    // Simulate API call
+    setTimeout(() => {
+        showNotification('Registration successful! Please check your email for verification.', 'success');
+        
+        // Redirect to login or dashboard
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+    }, 2000);
+}
+
+function handlePatientRegistration(form) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.classList.add('loading');
+    submitButton.disabled = true;
+    
+    const formData = new FormData(form);
+    const patientData = {
+        // Personal Info
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        phone: formData.get('phone'),
+        dateOfBirth: formData.get('dateOfBirth'),
+        address: formData.get('address'),
+        city: formData.get('city'),
+        zipCode: formData.get('zipCode'),
+        
+        // Medical Info
+        bloodType: formData.get('bloodType'),
+        weight: formData.get('weight'),
+        medicalCondition: formData.get('medicalCondition'),
+        physician: formData.get('physician'),
+        physicianPhone: formData.get('physicianPhone'),
+        urgency: formData.get('urgency'),
+        
+        // Account Setup
+        password: formData.get('password'),
+        emergencyContact1: formData.get('emergencyContact1'),
+        emergencyPhone1: formData.get('emergencyPhone1'),
+        emergencyContact2: formData.get('emergencyContact2'),
+        emergencyPhone2: formData.get('emergencyPhone2'),
+        insuranceProvider: formData.get('insuranceProvider'),
+        notifications: formData.get('notifications') === 'on',
+        emergencyAlerts: formData.get('emergencyAlerts') === 'on'
+    };
+    
+    // Simulate API call
+    setTimeout(() => {
+        showNotification('Registration successful! Your account is being reviewed.', 'success');
+        
+        // Redirect to login
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+    }, 2000);
+}
+
+function handleHospitalRegistration(form) {
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.classList.add('loading');
+    submitButton.disabled = true;
+    
+    const formData = new FormData(form);
+    const hospitalData = {
+        // Hospital Info
+        hospitalName: formData.get('hospitalName'),
+        hospitalType: formData.get('hospitalType'),
+        bedCapacity: formData.get('bedCapacity'),
+        address: formData.get('address'),
+        city: formData.get('city'),
+        state: formData.get('state'),
+        zipCode: formData.get('zipCode'),
+        phone: formData.get('phone'),
+        website: formData.get('website'),
+        
+        // Admin Setup
+        adminFirstName: formData.get('adminFirstName'),
+        adminLastName: formData.get('adminLastName'),
+        adminEmail: formData.get('adminEmail'),
+        adminPhone: formData.get('adminPhone'),
+        adminTitle: formData.get('adminTitle'),
+        password: formData.get('password'),
+        services: formData.getAll('services'),
+        
+        // Verification
+        licenseNumber: formData.get('licenseNumber'),
+        accreditation: formData.get('accreditation'),
+        taxId: formData.get('taxId'),
+        emergencyContact: formData.get('emergencyContact'),
+        emergencyPhone: formData.get('emergencyPhone'),
+        operatingHours: formData.get('operatingHours'),
+        dataSharing: formData.get('dataSharing') === 'on',
+        emergencyNetwork: formData.get('emergencyNetwork') === 'on',
+        qualityAssurance: formData.get('qualityAssurance') === 'on'
+    };
+    
+    // Simulate API call
+    setTimeout(() => {
+        showNotification('Registration submitted! Your application will be reviewed within 24-48 hours.', 'success');
+        
+        // Redirect to login
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+    }, 2000);
+}
+
+// Enhanced Notification System
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <i class="fas fa-${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
+        <button class="notification-close">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+
+    // Add notification styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${getNotificationColor(type)};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        z-index: 10001;
+        max-width: 400px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    `;
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 10);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        removeNotification(notification);
+    }, 5000);
+
+    // Handle close button
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        removeNotification(notification);
+    });
+
+    function removeNotification(notif) {
+        notif.style.transform = 'translateX(100%)';
+        setTimeout(() => notif.remove(), 300);
+    }
+}
+
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'exclamation-circle';
+        case 'warning': return 'exclamation-triangle';
+        default: return 'info-circle';
+    }
+}
+
+function getNotificationColor(type) {
+    switch (type) {
+        case 'success': return '#10b981';
+        case 'error': return '#ef4444';
+        case 'warning': return '#f59e0b';
+        default: return '#3b82f6';
+    }
+}
+
+// Form Validation Styles
+const validationStyles = `
+    .form-control-modern.error {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .notification {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .notification-content {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .notification-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+        flex-shrink: 0;
+    }
+    
+    .notification-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .notification {
+            top: 10px;
+            right: 10px;
+            left: 10px;
+            max-width: none;
+        }
+    }
+`;
+
+// Add validation styles to head
+const styleSheet = document.createElement('style');
+styleSheet.textContent = validationStyles;
+document.head.appendChild(styleSheet);
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Reset form step on page load
+    currentStep = 1;
+    updateFormStep();
+});

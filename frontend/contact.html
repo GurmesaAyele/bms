@@ -22,6 +22,22 @@
                 <a href="contact.html" class="nav-link active">Contact</a>
                 <a href="become-donor.html" class="nav-link">Become a Donor</a>
                 <a href="request-blood.html" class="nav-link">Request Blood</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">
+                        Register <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="auth/register-donor.html" class="dropdown-item">
+                            <i class="fas fa-heart"></i> Register as Donor
+                        </a>
+                        <a href="auth/register-patient.html" class="dropdown-item">
+                            <i class="fas fa-user-injured"></i> Register as Patient
+                        </a>
+                        <a href="auth/register-hospital.html" class="dropdown-item">
+                            <i class="fas fa-hospital"></i> Register as Hospital
+                        </a>
+                    </div>
+                </div>
                 <a href="auth/login.html" class="nav-link">Login</a>
             </div>
             <div class="nav-toggle">
@@ -32,152 +48,131 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section contact-hero">
-        <div class="hero-content">
-            <div class="container">
-                <h1>Contact Us</h1>
-                <p class="hero-subtitle">We're here to help you save lives</p>
+    <!-- Hero Section - Ultra Compact -->
+    <section class="hero-compact">
+        <div class="container">
+            <div class="hero-horizontal">
+                <div class="hero-text">
+                    <h1>Contact Us</h1>
+                    <p>We're here to help you save lives. Get support, ask questions, or partner with us.</p>
+                    <div class="hero-actions-inline">
+                        <a href="tel:1-800-BLOOD-911" class="btn btn-emergency">
+                            <i class="fas fa-phone"></i> Emergency
+                        </a>
+                        <a href="mailto:info@bloodconnect.org" class="btn btn-outline-light">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-stats-inline">
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Support</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">5min</div>
+                        <div class="stat-label">Response</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Helpful</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="hero-overlay"></div>
     </section>
 
-    <!-- Emergency Banner -->
-    <section class="emergency-banner">
+    <!-- Contact Info & Form - Ultra Compact Side by Side -->
+    <section class="main-content-horizontal">
         <div class="container">
-            <div class="emergency-content">
-                <div class="emergency-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="emergency-text">
-                    <h3>Medical Emergency?</h3>
-                    <p>For immediate blood needs, call our 24/7 emergency hotline</p>
-                </div>
-                <div class="emergency-action">
-                    <a href="tel:1-800-BLOOD-911" class="btn btn-danger btn-lg">
-                        <i class="fas fa-phone"></i>
-                        1-800-BLOOD-911
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="contact-section">
-        <div class="container">
-            <div class="contact-content">
-                <div class="contact-info">
+            <div class="content-grid">
+                <!-- Contact Information -->
+                <div class="content-section">
                     <h2>Get in Touch</h2>
-                    <p>Have questions about blood donation, need support, or want to partner with us? We'd love to hear from you.</p>
-                    
-                    <div class="contact-methods">
-                        <div class="contact-method">
-                            <div class="contact-icon">
+                    <div class="contact-methods-compact">
+                        <div class="contact-method-mini">
+                            <div class="contact-icon-mini">
                                 <i class="fas fa-map-marker-alt"></i>
                             </div>
-                            <div class="contact-details">
-                                <h3>Visit Us</h3>
-                                <p>123 Healthcare Avenue<br>Medical District<br>New York, NY 10001</p>
+                            <div class="contact-details-mini">
+                                <h4>Visit</h4>
+                                <p>123 Healthcare Ave<br>New York, NY 10001</p>
                             </div>
                         </div>
                         
-                        <div class="contact-method">
-                            <div class="contact-icon">
+                        <div class="contact-method-mini">
+                            <div class="contact-icon-mini">
                                 <i class="fas fa-phone"></i>
                             </div>
-                            <div class="contact-details">
-                                <h3>Call Us</h3>
-                                <p><strong>General:</strong> (555) 123-4567<br>
-                                <strong>Emergency:</strong> 1-800-BLOOD-911<br>
-                                <strong>Donors:</strong> (555) 123-GIVE</p>
+                            <div class="contact-details-mini">
+                                <h4>Call</h4>
+                                <p>General: (555) 123-4567<br>Emergency: 1-800-BLOOD-911</p>
                             </div>
                         </div>
                         
-                        <div class="contact-method">
-                            <div class="contact-icon">
+                        <div class="contact-method-mini">
+                            <div class="contact-icon-mini">
                                 <i class="fas fa-envelope"></i>
                             </div>
-                            <div class="contact-details">
-                                <h3>Email Us</h3>
-                                <p><strong>General:</strong> info@bloodconnect.org<br>
-                                <strong>Support:</strong> support@bloodconnect.org<br>
-                                <strong>Emergency:</strong> emergency@bloodconnect.org</p>
+                            <div class="contact-details-mini">
+                                <h4>Email</h4>
+                                <p>info@bloodconnect.org<br>support@bloodconnect.org</p>
                             </div>
                         </div>
                         
-                        <div class="contact-method">
-                            <div class="contact-icon">
+                        <div class="contact-method-mini">
+                            <div class="contact-icon-mini">
                                 <i class="fas fa-clock"></i>
                             </div>
-                            <div class="contact-details">
-                                <h3>Office Hours</h3>
-                                <p><strong>Mon-Fri:</strong> 8:00 AM - 6:00 PM<br>
-                                <strong>Saturday:</strong> 9:00 AM - 4:00 PM<br>
-                                <strong>Emergency:</strong> 24/7 Available</p>
+                            <div class="contact-details-mini">
+                                <h4>Hours</h4>
+                                <p>Mon-Fri: 8AM-6PM<br>Emergency: 24/7</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="contact-form-container">
-                    <form class="contact-form" id="contactForm">
-                        <h3>Send us a Message</h3>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="firstName">First Name *</label>
-                                <input type="text" id="firstName" name="firstName" class="form-control" required>
+                <!-- Contact Form -->
+                <div class="content-section">
+                    <h2>Send Message</h2>
+                    <form class="contact-form-compact" id="contactForm">
+                        <div class="form-row-compact">
+                            <div class="form-group-compact">
+                                <input type="text" id="firstName" name="firstName" class="form-control-compact" placeholder="First Name *" required>
                             </div>
-                            <div class="form-group">
-                                <label for="lastName">Last Name *</label>
-                                <input type="text" id="lastName" name="lastName" class="form-control" required>
+                            <div class="form-group-compact">
+                                <input type="text" id="lastName" name="lastName" class="form-control-compact" placeholder="Last Name *" required>
                             </div>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="email">Email Address *</label>
-                                <input type="email" id="email" name="email" class="form-control" required>
+                        <div class="form-row-compact">
+                            <div class="form-group-compact">
+                                <input type="email" id="email" name="email" class="form-control-compact" placeholder="Email Address *" required>
                             </div>
-                            <div class="form-group">
-                                <label for="phone">Phone Number</label>
-                                <input type="tel" id="phone" name="phone" class="form-control">
+                            <div class="form-group-compact">
+                                <input type="tel" id="phone" name="phone" class="form-control-compact" placeholder="Phone Number">
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="subject">Subject *</label>
-                            <select id="subject" name="subject" class="form-control" required>
-                                <option value="">Select a subject</option>
+                        <div class="form-group-compact">
+                            <select id="subject" name="subject" class="form-control-compact" required>
+                                <option value="">Select Subject *</option>
                                 <option value="general">General Inquiry</option>
                                 <option value="donor-support">Donor Support</option>
                                 <option value="hospital-partnership">Hospital Partnership</option>
                                 <option value="technical-support">Technical Support</option>
                                 <option value="feedback">Feedback</option>
-                                <option value="media">Media Inquiry</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="message">Message *</label>
-                            <textarea id="message" name="message" class="form-control" rows="6" placeholder="Please provide details about your inquiry..." required></textarea>
+                        <div class="form-group-compact">
+                            <textarea id="message" name="message" class="form-control-compact" rows="4" placeholder="Your message..." required></textarea>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="newsletter" value="yes">
-                                <span class="checkmark"></span>
-                                Subscribe to our newsletter for updates and blood drive notifications
-                            </label>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane"></i>
-                                Send Message
+                        <div class="form-actions-compact">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-paper-plane"></i> Send Message
                             </button>
                         </div>
                     </form>
@@ -186,121 +181,98 @@
         </div>
     </section>
 
-    <!-- FAQ Section -->
-    <section class="faq-section">
+    <!-- FAQ & Support - Ultra Compact Side by Side -->
+    <section class="faq-support-horizontal">
         <div class="container">
-            <div class="section-header">
-                <h2>Frequently Asked Questions</h2>
-                <p>Quick answers to common questions</p>
-            </div>
-            <div class="faq-content">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How do I register as a blood donor?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can register as a blood donor by clicking the "Become a Donor" button on our homepage or visiting our registration page. You'll need to provide basic information, complete a health questionnaire, and verify your eligibility.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How often can I donate blood?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can donate whole blood every 56 days (8 weeks). For other types of donations like platelets, the frequency may be different. Our system will automatically track your eligibility and notify you when you're ready to donate again.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is my personal information secure?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, we take data security very seriously. All personal and medical information is encrypted and stored securely. We comply with HIPAA regulations and never share your information without your explicit consent.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How do emergency blood requests work?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>When a hospital submits an emergency blood request, our system immediately notifies all eligible donors in the area via SMS, email, and push notifications. Donors can respond within minutes to help save lives.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can hospitals join BloodConnect?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, hospitals and blood banks can register to join our network. There's a verification process to ensure legitimacy and compliance with medical standards. Contact us for more information about hospital partnerships.</p>
+            <div class="content-grid">
+                <!-- FAQ -->
+                <div class="content-section">
+                    <h2>FAQ</h2>
+                    <div class="faq-content-compact">
+                        <div class="faq-item-mini">
+                            <div class="faq-question-mini">
+                                <h4>How to register as donor?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer-mini">
+                                <p>Click "Become a Donor", fill the form, complete health questionnaire.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item-mini">
+                            <div class="faq-question-mini">
+                                <h4>How often can I donate?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer-mini">
+                                <p>Every 56 days (8 weeks) for whole blood. System tracks eligibility automatically.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item-mini">
+                            <div class="faq-question-mini">
+                                <h4>Is my data secure?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer-mini">
+                                <p>Yes, encrypted storage, HIPAA compliant, never shared without consent.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item-mini">
+                            <div class="faq-question-mini">
+                                <h4>Emergency requests?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer-mini">
+                                <p>Instant notifications to eligible donors via SMS, email, push notifications.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>What if I need to cancel a donation appointment?</h3>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can cancel or reschedule your donation appointment through your donor dashboard or by calling us directly. We understand that circumstances change, and we appreciate any advance notice you can provide.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Map Section -->
-    <section class="map-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Find Us</h2>
-                <p>Visit our headquarters or find a donation center near you</p>
-            </div>
-            <div class="map-container">
-                <div class="map-placeholder">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <p>Interactive map would be integrated here</p>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-directions"></i>
-                        Get Directions
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Support Section -->
-    <section class="support-section">
-        <div class="container">
-            <div class="support-content">
-                <div class="support-item">
-                    <div class="support-icon">
-                        <i class="fas fa-headset"></i>
+                <!-- Support -->
+                <div class="content-section">
+                    <h2>Support</h2>
+                    <div class="support-content-compact">
+                        <div class="support-item-mini">
+                            <div class="support-icon-mini">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="support-info-mini">
+                                <h4>24/7 Support</h4>
+                                <p>Available around the clock for emergencies</p>
+                            </div>
+                        </div>
+                        
+                        <div class="support-item-mini">
+                            <div class="support-icon-mini">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="support-info-mini">
+                                <h4>Mobile App</h4>
+                                <p>Easy scheduling and notifications</p>
+                            </div>
+                        </div>
+                        
+                        <div class="support-item-mini">
+                            <div class="support-icon-mini">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="support-info-mini">
+                                <h4>Community</h4>
+                                <p>Connect with other life-savers</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3>24/7 Support</h3>
-                    <p>Our support team is available around the clock for emergencies and urgent inquiries.</p>
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">
-                        <i class="fas fa-mobile-alt"></i>
+                    
+                    <div class="map-placeholder-mini">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <p>Find donation centers near you</p>
+                        <button class="btn btn-primary btn-mini">
+                            <i class="fas fa-directions"></i> Get Directions
+                        </button>
                     </div>
-                    <h3>Mobile App</h3>
-                    <p>Download our mobile app for easy access to donation scheduling and emergency notifications.</p>
-                </div>
-                <div class="support-item">
-                    <div class="support-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Community</h3>
-                    <p>Join our donor community and connect with other life-savers in your area.</p>
                 </div>
             </div>
         </div>

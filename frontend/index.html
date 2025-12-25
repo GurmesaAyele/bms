@@ -23,6 +23,22 @@
                 <a href="contact.html" class="nav-link">Contact</a>
                 <a href="become-donor.html" class="nav-link">Become a Donor</a>
                 <a href="request-blood.html" class="nav-link">Request Blood</a>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-trigger">
+                        Register <i class="fas fa-chevron-down"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a href="auth/register-donor.html" class="dropdown-item">
+                            <i class="fas fa-heart"></i> Register as Donor
+                        </a>
+                        <a href="auth/register-patient.html" class="dropdown-item">
+                            <i class="fas fa-user-injured"></i> Register as Patient
+                        </a>
+                        <a href="auth/register-hospital.html" class="dropdown-item">
+                            <i class="fas fa-hospital"></i> Register as Hospital
+                        </a>
+                    </div>
+                </div>
                 <a href="auth/login.html" class="nav-link">Login</a>
             </div>
             <div class="nav-toggle">
@@ -70,109 +86,355 @@
         </div>
     </section>
 
-    <!-- Blood Availability & How It Works - Side by Side -->
-    <section class="main-content-horizontal">
+    <!-- Live Blood Availability Section -->
+    <section class="blood-availability-section">
         <div class="container">
-            <div class="content-grid">
-                <!-- Blood Availability -->
-                <div class="content-section">
-                    <h2>Live Blood Availability</h2>
-                    <div class="blood-grid-compact">
-                        <div class="blood-item" data-type="A+">
-                            <span class="blood-type">A+</span>
-                            <span class="blood-count counter" data-target="24">24</span>
-                            <span class="blood-status available">Available</span>
+            <div class="section-header-modern">
+                <h2><i class="fas fa-tint"></i> Live Blood Availability</h2>
+                <p>Real-time blood inventory across our network</p>
+                <div class="last-updated">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Last updated: <span id="lastUpdated">Loading...</span></span>
+                </div>
+            </div>
+            
+            <div class="blood-availability-grid">
+                <div class="blood-type-card" data-type="A+">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">A+</div>
+                        <div class="blood-type-info">
+                            <h3>Type A+</h3>
+                            <p>Can donate to A+, AB+</p>
                         </div>
-                        <div class="blood-item" data-type="O+">
-                            <span class="blood-type">O+</span>
-                            <span class="blood-count counter" data-target="18">18</span>
-                            <span class="blood-status available">Available</span>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="a-plus-count">24</div>
+                            <div class="stat-label">Units Available</div>
                         </div>
-                        <div class="blood-item" data-type="B+">
-                            <span class="blood-type">B+</span>
-                            <span class="blood-count counter" data-target="12">12</span>
-                            <span class="blood-status low">Low</span>
+                        <div class="stat-item">
+                            <div class="stat-number" id="a-plus-donors">156</div>
+                            <div class="stat-label">Active Donors</div>
                         </div>
-                        <div class="blood-item" data-type="AB+">
-                            <span class="blood-type">AB+</span>
-                            <span class="blood-count counter" data-target="8">8</span>
-                            <span class="blood-status low">Low</span>
+                    </div>
+                    <div class="availability-status available">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Available</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="O+">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">O+</div>
+                        <div class="blood-type-info">
+                            <h3>Type O+</h3>
+                            <p>Can donate to A+, B+, AB+, O+</p>
                         </div>
-                        <div class="blood-item" data-type="A-">
-                            <span class="blood-type">A-</span>
-                            <span class="blood-count counter" data-target="15">15</span>
-                            <span class="blood-status available">Available</span>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="o-plus-count">18</div>
+                            <div class="stat-label">Units Available</div>
                         </div>
-                        <div class="blood-item" data-type="O-">
-                            <span class="blood-type">O-</span>
-                            <span class="blood-count counter" data-target="6">6</span>
-                            <span class="blood-status critical">Critical</span>
+                        <div class="stat-item">
+                            <div class="stat-number" id="o-plus-donors">203</div>
+                            <div class="stat-label">Active Donors</div>
                         </div>
-                        <div class="blood-item" data-type="B-">
-                            <span class="blood-type">B-</span>
-                            <span class="blood-count counter" data-target="9">9</span>
-                            <span class="blood-status low">Low</span>
+                    </div>
+                    <div class="availability-status available">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Available</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="B+">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">B+</div>
+                        <div class="blood-type-info">
+                            <h3>Type B+</h3>
+                            <p>Can donate to B+, AB+</p>
                         </div>
-                        <div class="blood-item" data-type="AB-">
-                            <span class="blood-type">AB-</span>
-                            <span class="blood-count counter" data-target="4">4</span>
-                            <span class="blood-status critical">Critical</span>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="b-plus-count">12</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="b-plus-donors">89</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status low">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Low Stock</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="AB+">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">AB+</div>
+                        <div class="blood-type-info">
+                            <h3>Type AB+</h3>
+                            <p>Universal plasma donor</p>
+                        </div>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="ab-plus-count">8</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="ab-plus-donors">34</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status low">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Low Stock</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="A-">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">A-</div>
+                        <div class="blood-type-info">
+                            <h3>Type A-</h3>
+                            <p>Can donate to A+, A-, AB+, AB-</p>
+                        </div>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="a-minus-count">15</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="a-minus-donors">67</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status available">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Available</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="O-">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">O-</div>
+                        <div class="blood-type-info">
+                            <h3>Type O-</h3>
+                            <p>Universal blood donor</p>
+                        </div>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="o-minus-count">6</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="o-minus-donors">45</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status critical">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Critical</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="B-">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">B-</div>
+                        <div class="blood-type-info">
+                            <h3>Type B-</h3>
+                            <p>Can donate to B+, B-, AB+, AB-</p>
+                        </div>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="b-minus-count">9</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="b-minus-donors">38</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status low">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Low Stock</span>
+                    </div>
+                </div>
+
+                <div class="blood-type-card" data-type="AB-">
+                    <div class="blood-type-header">
+                        <div class="blood-type-icon">AB-</div>
+                        <div class="blood-type-info">
+                            <h3>Type AB-</h3>
+                            <p>Can donate to AB+, AB-</p>
+                        </div>
+                    </div>
+                    <div class="blood-stats">
+                        <div class="stat-item">
+                            <div class="stat-number" id="ab-minus-count">4</div>
+                            <div class="stat-label">Units Available</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="ab-minus-donors">21</div>
+                            <div class="stat-label">Active Donors</div>
+                        </div>
+                    </div>
+                    <div class="availability-status critical">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Critical</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="blood-availability-actions">
+                <a href="request-blood.html" class="btn btn-primary btn-lg">
+                    <i class="fas fa-hand-holding-medical"></i> Request Blood
+                </a>
+                <a href="become-donor.html" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-heart"></i> Become a Donor
+                </a>
+                <button class="btn btn-outline-primary" onclick="refreshBloodData()">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section">
+        <div class="container">
+            <div class="section-header-modern">
+                <h2><i class="fas fa-cogs"></i> How BloodConnect Works</h2>
+                <p>Simple steps to save lives and get help when you need it</p>
+            </div>
+
+            <div class="how-it-works-content">
+                <div class="process-flow">
+                    <div class="process-step-large">
+                        <div class="step-number">1</div>
+                        <div class="step-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>Register Your Account</h3>
+                            <p>Choose your role: Donor, Patient, or Hospital. Complete your profile with necessary information.</p>
+                            <ul class="step-features">
+                                <li><i class="fas fa-check"></i> Quick 3-step registration</li>
+                                <li><i class="fas fa-check"></i> Secure data protection</li>
+                                <li><i class="fas fa-check"></i> Email verification</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="process-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+
+                    <div class="process-step-large">
+                        <div class="step-number">2</div>
+                        <div class="step-icon">
+                            <i class="fas fa-search-location"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>Smart Matching System</h3>
+                            <p>Our AI-powered system matches donors with recipients based on blood type, location, and urgency.</p>
+                            <ul class="step-features">
+                                <li><i class="fas fa-check"></i> Real-time matching</li>
+                                <li><i class="fas fa-check"></i> Location-based priority</li>
+                                <li><i class="fas fa-check"></i> Emergency alerts</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="process-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+
+                    <div class="process-step-large">
+                        <div class="step-number">3</div>
+                        <div class="step-icon">
+                            <i class="fas fa-heart-pulse"></i>
+                        </div>
+                        <div class="step-content">
+                            <h3>Save Lives Together</h3>
+                            <p>Complete the donation process at verified hospitals and track your impact on saving lives.</p>
+                            <ul class="step-features">
+                                <li><i class="fas fa-check"></i> Safe donation process</li>
+                                <li><i class="fas fa-check"></i> Impact tracking</li>
+                                <li><i class="fas fa-check"></i> Recognition system</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- How It Works -->
-                <div class="content-section">
-                    <h2>How It Works</h2>
-                    <div class="steps-horizontal">
-                        <div class="step-item">
-                            <div class="step-icon">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="step-content">
-                                <h3>Register</h3>
-                                <p>Sign up as donor, patient, or hospital</p>
-                            </div>
+                <div class="how-it-works-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
                         </div>
-                        <div class="step-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                        <div class="step-item">
-                            <div class="step-icon">
-                                <i class="fas fa-search-location"></i>
-                            </div>
-                            <div class="step-content">
-                                <h3>Match</h3>
-                                <p>We connect donors with recipients</p>
-                            </div>
-                        </div>
-                        <div class="step-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                        <div class="step-item">
-                            <div class="step-icon">
-                                <i class="fas fa-heart-pulse"></i>
-                            </div>
-                            <div class="step-content">
-                                <h3>Save Lives</h3>
-                                <p>Complete donation and help save lives</p>
-                            </div>
+                        <div class="stat-info">
+                            <div class="stat-number">< 30min</div>
+                            <div class="stat-label">Average Response Time</div>
                         </div>
                     </div>
-                    
-                    <!-- Quick Actions -->
-                    <div class="quick-actions-horizontal">
-                        <a href="become-donor.html" class="btn btn-primary">
-                            <i class="fas fa-heart"></i> Become Donor
-                        </a>
-                        <a href="request-blood.html" class="btn btn-outline-primary">
-                            <i class="fas fa-hand-holding-medical"></i> Request Blood
-                        </a>
-                        <a href="auth/login.html" class="btn btn-secondary">
-                            <i class="fas fa-sign-in-alt"></i> Login
-                        </a>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Safe & Verified</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Support Available</div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Rated Hospitals Section -->
+    <section class="top-hospitals-section">
+        <div class="container">
+            <div class="section-header-modern">
+                <h2><i class="fas fa-hospital"></i> Top Rated Partner Hospitals</h2>
+                <p>Trusted healthcare facilities in our network</p>
+                <div class="hospital-filters">
+                    <button class="filter-btn active" data-filter="all">All Hospitals</button>
+                    <button class="filter-btn" data-filter="general">General</button>
+                    <button class="filter-btn" data-filter="specialty">Specialty</button>
+                    <button class="filter-btn" data-filter="trauma">Trauma Centers</button>
+                </div>
+            </div>
+
+            <div class="hospitals-grid" id="hospitalsGrid">
+                <!-- Hospitals will be loaded dynamically -->
+                <div class="loading-hospitals">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading hospitals...</p>
+                </div>
+            </div>
+
+            <div class="hospitals-actions">
+                <button class="btn btn-primary" onclick="loadMoreHospitals()">
+                    <i class="fas fa-plus"></i> Load More Hospitals
+                </button>
+                <a href="auth/register-hospital.html" class="btn btn-secondary">
+                    <i class="fas fa-hospital"></i> Register Your Hospital
+                </a>
             </div>
         </div>
     </section>

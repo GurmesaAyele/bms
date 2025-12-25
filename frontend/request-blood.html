@@ -32,19 +32,8 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section request-hero">
-        <div class="hero-content">
-            <div class="container">
-                <h1>Request Blood</h1>
-                <p class="hero-subtitle">Get the blood you need when you need it most</p>
-            </div>
-        </div>
-        <div class="hero-overlay"></div>
-    </section>
-
     <!-- Hero Section - Ultra Compact -->
-    <section class="hero-compact request-hero">
+    <section class="hero-compact">
         <div class="container">
             <div class="hero-horizontal">
                 <div class="hero-text">
@@ -233,7 +222,30 @@
         </div>
     </section>
 
-    <!-- Request Form Modal -->
+    <!-- Hospital Selection Modal -->
+    <div class="modal-overlay" id="hospitalSelectionModal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Select Hospital for Blood Request</h3>
+                <button class="modal-close" onclick="closeHospitalSelectionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="hospital-selection-content">
+                    <div class="selection-header">
+                        <h4>Available Hospitals with <span id="selectedBloodType">A+</span> Blood</h4>
+                        <p>Only ACTIVE and VERIFIED hospitals with sufficient stock are shown</p>
+                    </div>
+                    <div class="hospitals-list" id="hospitalsList">
+                        <!-- Hospitals will be populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blood Request Form Modal -->
     <div class="modal-overlay" id="requestModal" style="display: none;">
         <div class="modal-content large">
             <div class="modal-header">

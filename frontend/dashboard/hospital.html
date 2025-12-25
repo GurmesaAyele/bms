@@ -12,6 +12,7 @@
 </head>
 <body class="dashboard-body">
     <!-- Dashboard Navigation -->
+     
     <nav class="dashboard-nav">
         <div class="nav-brand">
             <i class="fas fa-tint"></i>
@@ -77,6 +78,22 @@
                     <a href="#" class="menu-item">
                         <i class="fas fa-user-check"></i>
                         <span>Donor Approvals</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-heart"></i>
+                        <span>Donation Offers</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>Donations</h3>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Scheduled Donations</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Confirm Donations</span>
                     </a>
                 </div>
                 
@@ -480,6 +497,210 @@
                                     Track Delivery
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation Offers Management -->
+            <div class="donation-offers-management">
+                <div class="section-header">
+                    <h3>Donation Offers from Donors</h3>
+                    <div class="section-actions">
+                        <span class="badge primary">5 pending review</span>
+                        <button class="btn btn-info" onclick="viewWorkflowStatus()">
+                            <i class="fas fa-chart-line"></i>
+                            Workflow Status
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshDonationOffers()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Workflow Status Panel -->
+                <div class="workflow-status-panel" id="workflowStatusPanel" style="display: none;">
+                    <div class="workflow-stats">
+                        <div class="workflow-stat">
+                            <div class="stat-icon pending">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="pendingCount">0</div>
+                                <div class="stat-label">Pending Review</div>
+                            </div>
+                        </div>
+                        <div class="workflow-stat">
+                            <div class="stat-icon accepted">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="acceptedCount">0</div>
+                                <div class="stat-label">Accepted & Scheduled</div>
+                            </div>
+                        </div>
+                        <div class="workflow-stat">
+                            <div class="stat-icon completed">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="completedCount">0</div>
+                                <div class="stat-label">Donations Completed</div>
+                            </div>
+                        </div>
+                        <div class="workflow-stat">
+                            <div class="stat-icon rejected">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-number" id="rejectedCount">0</div>
+                                <div class="stat-label">Rejected Offers</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="workflow-rules">
+                        <h4>System Rules Active</h4>
+                        <div class="rule-item">
+                            <i class="fas fa-check text-success"></i>
+                            <span>One donation → one hospital (exclusive offers)</span>
+                        </div>
+                        <div class="rule-item">
+                            <i class="fas fa-check text-success"></i>
+                            <span>Hospital must accept donor before donation</span>
+                        </div>
+                        <div class="rule-item">
+                            <i class="fas fa-check text-success"></i>
+                            <span>Donor cannot donate without eligibility</span>
+                        </div>
+                        <div class="rule-item">
+                            <i class="fas fa-check text-success"></i>
+                            <span>Admin can view all donations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="donation-offers-list">
+                    <div class="donation-offer-item pending">
+                        <div class="donor-info">
+                            <div class="donor-avatar">
+                                <img src="https://via.placeholder.com/50" alt="John Doe">
+                            </div>
+                            <div class="donor-details">
+                                <h4>John Doe</h4>
+                                <p><strong>O+ Blood • 450ml</strong></p>
+                                <p>Available: Tomorrow 2:00 PM</p>
+                                <div class="donor-stats">
+                                    <span class="stat">
+                                        <i class="fas fa-tint"></i>
+                                        12 donations
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-star"></i>
+                                        Verified donor
+                                    </span>
+                                </div>
+                                <span class="offer-time">25 minutes ago</span>
+                            </div>
+                        </div>
+                        <div class="donation-status">
+                            <span class="status-badge pending">Pending Review</span>
+                        </div>
+                        <div class="donation-actions">
+                            <button class="btn-sm success" onclick="acceptDonationOffer('don-001', 'John Doe', 'O+')">
+                                <i class="fas fa-check"></i>
+                                Accept Donor
+                            </button>
+                            <button class="btn-sm danger" onclick="rejectDonationOffer('don-001', 'John Doe')">
+                                <i class="fas fa-times"></i>
+                                Reject
+                            </button>
+                            <button class="btn-sm info" onclick="viewDonorProfile('don-001')">
+                                <i class="fas fa-user"></i>
+                                Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="donation-offer-item pending">
+                        <div class="donor-info">
+                            <div class="donor-avatar">
+                                <img src="https://via.placeholder.com/50" alt="Sarah Miller">
+                            </div>
+                            <div class="donor-details">
+                                <h4>Sarah Miller</h4>
+                                <p><strong>A+ Blood • 450ml</strong></p>
+                                <p>Available: Today 4:00 PM</p>
+                                <div class="donor-stats">
+                                    <span class="stat">
+                                        <i class="fas fa-tint"></i>
+                                        8 donations
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Health verified
+                                    </span>
+                                </div>
+                                <span class="offer-time">1 hour ago</span>
+                            </div>
+                        </div>
+                        <div class="donation-status">
+                            <span class="status-badge pending">Pending Review</span>
+                        </div>
+                        <div class="donation-actions">
+                            <button class="btn-sm success" onclick="acceptDonationOffer('don-002', 'Sarah Miller', 'A+')">
+                                <i class="fas fa-check"></i>
+                                Accept Donor
+                            </button>
+                            <button class="btn-sm danger" onclick="rejectDonationOffer('don-002', 'Sarah Miller')">
+                                <i class="fas fa-times"></i>
+                                Reject
+                            </button>
+                            <button class="btn-sm info" onclick="viewDonorProfile('don-002')">
+                                <i class="fas fa-user"></i>
+                                Profile
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="donation-offer-item accepted">
+                        <div class="donor-info">
+                            <div class="donor-avatar">
+                                <img src="https://via.placeholder.com/50" alt="Michael Johnson">
+                            </div>
+                            <div class="donor-details">
+                                <h4>Michael Johnson</h4>
+                                <p><strong>B+ Blood • 450ml</strong></p>
+                                <p>Scheduled: Today 6:00 PM</p>
+                                <div class="donor-stats">
+                                    <span class="stat">
+                                        <i class="fas fa-tint"></i>
+                                        15 donations
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-medal"></i>
+                                        Gold donor
+                                    </span>
+                                </div>
+                                <span class="offer-time">2 hours ago</span>
+                            </div>
+                        </div>
+                        <div class="donation-status">
+                            <span class="status-badge accepted">Appointment Confirmed</span>
+                        </div>
+                        <div class="donation-actions">
+                            <button class="btn-sm primary" onclick="confirmDonationCompleted('don-003', 'Michael Johnson', 'B+')">
+                                <i class="fas fa-check-circle"></i>
+                                Confirm Donation
+                            </button>
+                            <button class="btn-sm warning" onclick="rescheduleAppointment('don-003')">
+                                <i class="fas fa-calendar-alt"></i>
+                                Reschedule
+                            </button>
+                            <button class="btn-sm info" onclick="contactDonor('don-003')">
+                                <i class="fas fa-phone"></i>
+                                Contact
+                            </button>
                         </div>
                     </div>
                 </div>

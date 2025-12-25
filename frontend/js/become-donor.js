@@ -10,11 +10,48 @@ function initializeBecomeDonorPage() {
     // Initialize smooth scrolling
     initializeSmoothScrolling();
     
+    // Initialize section navigation
+    initializeSectionNavigation();
+    
     // Initialize animations
     initializeAnimations();
     
     // Initialize testimonial interactions
     initializeTestimonials();
+    
+    // Initialize FAQ functionality
+    initializeFAQ();
+}
+
+// Section Navigation
+function initializeSectionNavigation() {
+    // Handle dropdown menu clicks
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            scrollToSection(targetId);
+        });
+    });
+}
+
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+        
+        // Add highlight effect
+        section.style.background = 'rgba(220, 38, 38, 0.05)';
+        section.style.transition = 'background 0.5s ease';
+        
+        setTimeout(() => {
+            section.style.background = '';
+        }, 2000);
+    }
 }
 
 // Eligibility Checker
@@ -39,12 +76,11 @@ function checkEligibility() {
     const eligibilityData = {
         age: formData.get('age'),
         weight: formData.get('weight'),
-        lastDonation: formData.get('lastDonation'),
         health: formData.get('health')
     };
 
     // Validate that all questions are answered
-    if (!eligibilityData.age || !eligibilityData.weight || !eligibilityData.lastDonation || !eligibilityData.health) {
+    if (!eligibilityData.age || !eligibilityData.weight || !eligibilityData.health) {
         showNotification('Please answer all questions to check your eligibility', 'warning');
         return;
     }
@@ -77,32 +113,22 @@ function calculateEligibility(data) {
     }
 
     // Weight check
-    if (data.weight === 'under-110') {
+    if (data.weight === 'under-50') {
         eligible = false;
         issues.push({
             type: 'weight',
-            message: 'You must weigh at least 110 pounds (50 kg) to donate blood',
+            message: 'You must weigh at least 50kg to donate blood',
             solution: 'Maintain a healthy weight and try again when you meet the requirement'
         });
     }
 
-    // Last donation check
-    if (data.lastDonation === 'recent') {
-        eligible = false;
-        issues.push({
-            type: 'frequency',
-            message: 'You must wait at least 8 weeks between blood donations',
-            solution: 'Schedule your next donation for after the waiting period'
-        });
-    }
-
     // Health check
-    if (data.health === 'no') {
+    if (data.health === 'issues') {
         eligible = false;
         issues.push({
             type: 'health',
-            message: 'You must be feeling healthy to donate blood',
-            solution: 'Wait until you feel completely well before donating'
+            message: 'You must be in good health to donate blood',
+            solution: 'Address any health issues and consult with your doctor'
         });
     }
 
@@ -197,13 +223,12 @@ function updateEligibilityPreview() {
     const eligibilityData = {
         age: formData.get('age'),
         weight: formData.get('weight'),
-        lastDonation: formData.get('lastDonation'),
         health: formData.get('health')
     };
 
     // Count answered questions
     const answeredQuestions = Object.values(eligibilityData).filter(value => value !== null && value !== '').length;
-    const totalQuestions = 4;
+    const totalQuestions = 3;
     
     // Update progress if there's a progress indicator
     const progressBar = document.querySelector('.eligibility-progress');
@@ -419,15 +444,38 @@ function animateStats() {
 
 // Testimonials
 function initializeTestimonials() {
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    const testimonialCards = document.querySelectorAll('.testimonial-card-mini');
     
     testimonialCards.forEach(card => {
         card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-10px) scale(1.02)';
+            this.style.transform = 'translateY(-5px) scale(1.02)';
         });
         
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+}
+
+// FAQ Functionality
+function initializeFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item-mini');
+    
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question-mini');
+        
+        question.addEventListener('click', function() {
+            const isActive = item.classList.contains('active');
+            
+            // Close all other FAQ items
+            faqItems.forEach(otherItem => {
+                otherItem.classList.remove('active');
+            });
+            
+            // Toggle current item
+            if (!isActive) {
+                item.classList.add('active');
+            }
         });
     });
 }
