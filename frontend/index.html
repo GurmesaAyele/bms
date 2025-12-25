@@ -33,156 +33,146 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero pattern-bg">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h1 class="hero-title fade-in-up">
-                    Donate Blood. Save Lives.<br>
-                    <span class="highlight">Every Drop Matters.</span>
-                </h1>
-                <p class="hero-subtitle fade-in-up delay-1">
-                    Join our life-saving community. Connect donors with those in need 
-                    and make a difference with every donation.
-                </p>
-                <div class="hero-buttons fade-in-up delay-2">
-                    <a href="become-donor.html" class="btn btn-primary">
-                        <i class="fas fa-heart"></i>
-                        Become a Donor
-                    </a>
-                    <a href="request-blood.html" class="btn btn-secondary">
-                        <i class="fas fa-hand-holding-medical"></i>
-                        Request Blood
-                    </a>
-                    <a href="tel:1-800-BLOOD-911" class="btn btn-emergency">
-                        <i class="fas fa-phone-alt"></i>
-                        Emergency: 1-800-BLOOD-911
-                    </a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="blood-drop-animation emergency-pulse">
-                    <i class="fas fa-tint"></i>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Live Blood Availability -->
-    <section class="blood-availability">
+    <!-- Hero Section - Compact Horizontal Layout -->
+    <section id="home" class="hero-compact">
         <div class="container">
-            <h2 class="section-title">Live Blood Availability</h2>
-            <div class="blood-cards">
-                <div class="blood-card interactive-card" data-type="A+">
-                    <div class="blood-type">A+</div>
-                    <div class="blood-count counter" data-target="24">24</div>
-                    <div class="blood-status available">
-                        <i class="fas fa-check-circle"></i>
-                        Available
+            <div class="hero-horizontal">
+                <div class="hero-text">
+                    <h1>Donate Blood. Save Lives.</h1>
+                    <p>Join our life-saving community and make a difference with every donation.</p>
+                    <div class="hero-actions-inline">
+                        <a href="become-donor.html" class="btn btn-primary">
+                            <i class="fas fa-heart"></i> Become a Donor
+                        </a>
+                        <a href="request-blood.html" class="btn btn-secondary">
+                            <i class="fas fa-hand-holding-medical"></i> Request Blood
+                        </a>
+                        <a href="tel:1-800-BLOOD-911" class="btn btn-emergency">
+                            <i class="fas fa-phone-alt"></i> Emergency
+                        </a>
                     </div>
                 </div>
-                <div class="blood-card interactive-card" data-type="O+">
-                    <div class="blood-type">O+</div>
-                    <div class="blood-count counter" data-target="18">18</div>
-                    <div class="blood-status available">
-                        <i class="fas fa-check-circle"></i>
-                        Available
+                <div class="hero-stats-inline">
+                    <div class="stat-item">
+                        <div class="stat-number counter" data-target="1247">1247</div>
+                        <div class="stat-label">Active Donors</div>
                     </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="B+">
-                    <div class="blood-type">B+</div>
-                    <div class="blood-count counter" data-target="12">12</div>
-                    <div class="blood-status low">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Low Stock
+                    <div class="stat-item">
+                        <div class="stat-number counter" data-target="89">89</div>
+                        <div class="stat-label">Hospitals</div>
                     </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="AB+">
-                    <div class="blood-type">AB+</div>
-                    <div class="blood-count counter" data-target="8">8</div>
-                    <div class="blood-status low">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Low Stock
-                    </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="A-">
-                    <div class="blood-type">A-</div>
-                    <div class="blood-count counter" data-target="15">15</div>
-                    <div class="blood-status available">
-                        <i class="fas fa-check-circle"></i>
-                        Available
-                    </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="O-">
-                    <div class="blood-type blood-drop">O-</div>
-                    <div class="blood-count counter" data-target="6">6</div>
-                    <div class="blood-status critical">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Critical
-                    </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="B-">
-                    <div class="blood-type">B-</div>
-                    <div class="blood-count counter" data-target="9">9</div>
-                    <div class="blood-status low">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Low Stock
-                    </div>
-                </div>
-                <div class="blood-card interactive-card" data-type="AB-">
-                    <div class="blood-type">AB-</div>
-                    <div class="blood-count counter" data-target="4">4</div>
-                    <div class="blood-status critical">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Critical
+                    <div class="stat-item">
+                        <div class="stat-number counter" data-target="3456">3456</div>
+                        <div class="stat-label">Lives Saved</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
-    <section id="how-it-works" class="how-it-works">
+    <!-- Blood Availability & How It Works - Side by Side -->
+    <section class="main-content-horizontal">
         <div class="container">
-            <h2 class="section-title">How It Works</h2>
-            <div class="steps">
-                <div class="step interactive-card">
-                    <div class="step-icon">
-                        <i class="fas fa-user-plus"></i>
+            <div class="content-grid">
+                <!-- Blood Availability -->
+                <div class="content-section">
+                    <h2>Live Blood Availability</h2>
+                    <div class="blood-grid-compact">
+                        <div class="blood-item" data-type="A+">
+                            <span class="blood-type">A+</span>
+                            <span class="blood-count counter" data-target="24">24</span>
+                            <span class="blood-status available">Available</span>
+                        </div>
+                        <div class="blood-item" data-type="O+">
+                            <span class="blood-type">O+</span>
+                            <span class="blood-count counter" data-target="18">18</span>
+                            <span class="blood-status available">Available</span>
+                        </div>
+                        <div class="blood-item" data-type="B+">
+                            <span class="blood-type">B+</span>
+                            <span class="blood-count counter" data-target="12">12</span>
+                            <span class="blood-status low">Low</span>
+                        </div>
+                        <div class="blood-item" data-type="AB+">
+                            <span class="blood-type">AB+</span>
+                            <span class="blood-count counter" data-target="8">8</span>
+                            <span class="blood-status low">Low</span>
+                        </div>
+                        <div class="blood-item" data-type="A-">
+                            <span class="blood-type">A-</span>
+                            <span class="blood-count counter" data-target="15">15</span>
+                            <span class="blood-status available">Available</span>
+                        </div>
+                        <div class="blood-item" data-type="O-">
+                            <span class="blood-type">O-</span>
+                            <span class="blood-count counter" data-target="6">6</span>
+                            <span class="blood-status critical">Critical</span>
+                        </div>
+                        <div class="blood-item" data-type="B-">
+                            <span class="blood-type">B-</span>
+                            <span class="blood-count counter" data-target="9">9</span>
+                            <span class="blood-status low">Low</span>
+                        </div>
+                        <div class="blood-item" data-type="AB-">
+                            <span class="blood-type">AB-</span>
+                            <span class="blood-count counter" data-target="4">4</span>
+                            <span class="blood-status critical">Critical</span>
+                        </div>
                     </div>
-                    <h3>Register</h3>
-                    <p>Sign up as a donor, patient, or hospital</p>
                 </div>
-                <div class="step interactive-card">
-                    <div class="step-icon">
-                        <i class="fas fa-search-location"></i>
+
+                <!-- How It Works -->
+                <div class="content-section">
+                    <h2>How It Works</h2>
+                    <div class="steps-horizontal">
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Register</h3>
+                                <p>Sign up as donor, patient, or hospital</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-search-location"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Match</h3>
+                                <p>We connect donors with recipients</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-icon">
+                                <i class="fas fa-heart-pulse"></i>
+                            </div>
+                            <div class="step-content">
+                                <h3>Save Lives</h3>
+                                <p>Complete donation and help save lives</p>
+                            </div>
+                        </div>
                     </div>
-                    <h3>Find Match</h3>
-                    <p>We match donors with recipients instantly</p>
-                </div>
-                <div class="step interactive-card">
-                    <div class="step-icon">
-                        <i class="fas fa-heart-pulse"></i>
+                    
+                    <!-- Quick Actions -->
+                    <div class="quick-actions-horizontal">
+                        <a href="become-donor.html" class="btn btn-primary">
+                            <i class="fas fa-heart"></i> Become Donor
+                        </a>
+                        <a href="request-blood.html" class="btn btn-outline-primary">
+                            <i class="fas fa-hand-holding-medical"></i> Request Blood
+                        </a>
+                        <a href="auth/login.html" class="btn btn-secondary">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
                     </div>
-                    <h3>Save Lives</h3>
-                    <p>Complete donation and help save lives</p>
                 </div>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <a href="become-donor.html" class="btn btn-primary btn-lg">
-                    <i class="fas fa-heart"></i>
-                    Become a Donor
-                </a>
-                <a href="request-blood.html" class="btn btn-outline-primary btn-lg">
-                    <i class="fas fa-hand-holding-medical"></i>
-                    Request Blood
-                </a>
-                <a href="auth/login.html" class="btn btn-secondary btn-lg">
-                    <i class="fas fa-sign-in-alt"></i>
-                    Login to Dashboard
-                </a>
             </div>
         </div>
     </section>

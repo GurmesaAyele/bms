@@ -32,72 +32,150 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-section donor-hero pattern-bg">
-        <div class="hero-content">
-            <div class="container">
-                <h1>Become a Life Saver</h1>
-                <p class="hero-subtitle">Join thousands of heroes who donate blood and save lives every day</p>
-                <div class="hero-stats">
-                    <div class="hero-stat">
+    <!-- Hero Section - Compact -->
+    <section class="hero-compact donor-hero">
+        <div class="container">
+            <div class="hero-horizontal">
+                <div class="hero-text">
+                    <h1>Become a Life Saver</h1>
+                    <p>Join thousands of heroes who donate blood and save lives every day</p>
+                    <div class="hero-actions-inline">
+                        <a href="auth/register.html" class="btn btn-primary">
+                            <i class="fas fa-heart"></i> Start Saving Lives
+                        </a>
+                        <button class="btn btn-outline-light" onclick="scrollToEligibility()">
+                            <i class="fas fa-check-circle"></i> Check Eligibility
+                        </button>
+                    </div>
+                </div>
+                <div class="hero-stats-inline">
+                    <div class="stat-item">
                         <div class="stat-number counter" data-target="3">3</div>
                         <div class="stat-label">Lives saved per donation</div>
                     </div>
-                    <div class="hero-stat">
+                    <div class="stat-item">
                         <div class="stat-number counter" data-target="56">56</div>
                         <div class="stat-label">Days between donations</div>
                     </div>
-                    <div class="hero-stat">
+                    <div class="stat-item">
                         <div class="stat-number counter" data-target="1">1</div>
                         <div class="stat-label">Hour of your time</div>
                     </div>
                 </div>
-                <div class="hero-actions">
-                    <a href="auth/register.html" class="btn btn-primary btn-lg">
-                        <i class="fas fa-heart"></i>
-                        Start Saving Lives
-                    </a>
-                    <button class="btn btn-outline-light btn-lg" onclick="scrollToEligibility()">
-                        <i class="fas fa-check-circle"></i>
-                        Check Eligibility
-                    </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact & Eligibility - Side by Side -->
+    <section class="main-content-horizontal">
+        <div class="container">
+            <div class="content-grid">
+                <!-- Impact Stats -->
+                <div class="content-section">
+                    <h2>Your Impact</h2>
+                    <div class="impact-grid-compact">
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="impact-content">
+                                <div class="impact-number counter" data-target="3">3</div>
+                                <div class="impact-label">Lives Saved</div>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="impact-content">
+                                <div class="impact-number counter" data-target="1">1</div>
+                                <div class="impact-label">Hour Needed</div>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="impact-content">
+                                <div class="impact-number counter" data-target="56">56</div>
+                                <div class="impact-label">Days Between</div>
+                            </div>
+                        </div>
+                        <div class="impact-item">
+                            <div class="impact-icon">
+                                <i class="fas fa-tint"></i>
+                            </div>
+                            <div class="impact-content">
+                                <div class="impact-number counter" data-target="470">470</div>
+                                <div class="impact-label">ML Donated</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eligibility Checker -->
+                <div class="content-section" id="eligibility">
+                    <h2>Quick Eligibility Check</h2>
+                    <form class="eligibility-form-compact" id="eligibilityForm">
+                        <div class="form-group-inline">
+                            <label>Age:</label>
+                            <div class="radio-group-horizontal">
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="age" value="under-17">
+                                    <span>Under 17</span>
+                                </label>
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="age" value="17-65">
+                                    <span>17-65</span>
+                                </label>
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="age" value="over-65">
+                                    <span>Over 65</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group-inline">
+                            <label>Weight:</label>
+                            <div class="radio-group-horizontal">
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="weight" value="under-50">
+                                    <span>Under 50kg</span>
+                                </label>
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="weight" value="over-50">
+                                    <span>Over 50kg</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group-inline">
+                            <label>Health:</label>
+                            <div class="radio-group-horizontal">
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="health" value="good">
+                                    <span>Good Health</span>
+                                </label>
+                                <label class="radio-item-compact">
+                                    <input type="radio" name="health" value="issues">
+                                    <span>Health Issues</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-block" onclick="checkEligibility()">
+                            <i class="fas fa-check-circle"></i>
+                            Check My Eligibility
+                        </button>
+                    </form>
+
+                    <div class="eligibility-result" id="eligibilityResult" style="display: none;">
+                        <!-- Result will be shown here -->
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="hero-overlay"></div>
     </section>
-
-    <!-- Impact Section -->
-    <section class="impact-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>Your Impact as a Blood Donor</h2>
-                <p>See how your donation makes a real difference</p>
-            </div>
-            <div class="impact-stats">
-                <div class="impact-stat">
-                    <div class="stat-icon">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <div class="stat-number counter" data-target="3">3</div>
-                    <div class="stat-label">Lives Saved</div>
-                </div>
-                <div class="impact-stat">
-                    <div class="stat-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-number counter" data-target="1">1</div>
-                    <div class="stat-label">Hour Needed</div>
-                </div>
-                <div class="impact-stat">
-                    <div class="stat-icon">
-                        <i class="fas fa-calendar"></i>
-                    </div>
-                    <div class="stat-number counter" data-target="56">56</div>
-                    <div class="stat-label">Days Between</div>
-                </div>
-                <div class="impact-stat">
-                    <div class="stat-icon">
                         <i class="fas fa-tint"></i>
                     </div>
                     <div class="stat-number counter" data-target="470">470</div>
