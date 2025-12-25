@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Dashboard - BloodConnect</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <!-- Dashboard Navigation -->
+    <nav class="dashboard-nav">
+        <div class="nav-brand">
+            <i class="fas fa-tint"></i>
+            <span>BloodConnect</span>
+        </div>
+        <div class="nav-user">
+            <div class="user-info">
+                <span class="user-name">John Doe</span>
+                <span class="user-role">Donor</span>
+            </div>
+            <div class="user-avatar">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-icon" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">2</span>
+                </button>
+                <button class="btn-icon" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="btn-icon" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <h3>Dashboard</h3>
+                    <a href="#" class="menu-item active">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Overview</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>Donation</h3>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-heart"></i>
+                        <span>My Donations</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Schedule Donation</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Find Centers</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <h3>Profile</h3>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-user"></i>
+                        <span>My Profile</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-cogs"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Profile Card -->
+            <div class="donor-profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>John Doe</h2>
+                        <p>Registered Donor</p>
+                        <div class="blood-group-highlight">
+                            <i class="fas fa-tint"></i>
+                            <span>O+ Universal Donor</span>
+                        </div>
+                    </div>
+                    <div class="donation-status">
+                        <div class="status-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Available to Donate</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">Total Donations</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">36</div>
+                        <div class="stat-label">Lives Saved</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">2.5L</div>
+                        <div class="stat-label">Blood Donated</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">Gold</div>
+                        <div class="stat-label">Donor Level</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eligibility Status -->
+            <div class="eligibility-card">
+                <div class="card-header">
+                    <h3>Donation Eligibility</h3>
+                    <span class="badge success">Eligible</span>
+                </div>
+                <div class="eligibility-content">
+                    <div class="eligibility-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Last donation: 65 days ago</span>
+                    </div>
+                    <div class="eligibility-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Health status: Good</span>
+                    </div>
+                    <div class="eligibility-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <span>Age: 28 years (Eligible range)</span>
+                    </div>
+                    <div class="next-donation">
+                        <p><strong>Next donation available:</strong> Now</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-calendar-plus"></i>
+                            Schedule Donation
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Requests -->
+            <div class="emergency-requests">
+                <div class="card-header">
+                    <h3>Emergency Requests Near You</h3>
+                    <span class="badge danger">2 Urgent</span>
+                </div>
+                <div class="emergency-list">
+                    <div class="emergency-item urgent">
+                        <div class="emergency-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h4>Critical: O+ Blood Needed</h4>
+                            <p><strong>City General Hospital</strong> - 2.5 km away</p>
+                            <p>Patient in critical condition, immediate donation needed</p>
+                            <div class="emergency-actions">
+                                <button class="btn btn-danger btn-sm">
+                                    <i class="fas fa-phone"></i>
+                                    Call Hospital
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-directions"></i>
+                                    Get Directions
+                                </button>
+                            </div>
+                        </div>
+                        <div class="emergency-time">
+                            <span>Posted 15 min ago</span>
+                        </div>
+                    </div>
+
+                    <div class="emergency-item">
+                        <div class="emergency-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="emergency-content">
+                            <h4>O+ Blood Stock Low</h4>
+                            <p><strong>Metro Blood Bank</strong> - 4.1 km away</p>
+                            <p>Running low on O+ blood, donations needed</p>
+                            <div class="emergency-actions">
+                                <button class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-info-circle"></i>
+                                    More Info
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-calendar"></i>
+                                    Schedule Visit
+                                </button>
+                            </div>
+                        </div>
+                        <div class="emergency-time">
+                            <span>Posted 2 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation History Timeline -->
+            <div class="donation-history">
+                <div class="card-header">
+                    <h3>Donation History</h3>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker success">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>Blood Donation</h4>
+                            <p><strong>City General Hospital</strong></p>
+                            <p>Donated 450ml of O+ blood</p>
+                            <span class="timeline-date">October 20, 2024</span>
+                        </div>
+                        <div class="timeline-status">
+                            <span class="badge success">Completed</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker success">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>Emergency Donation</h4>
+                            <p><strong>Metro Blood Bank</strong></p>
+                            <p>Emergency donation for accident victim</p>
+                            <span class="timeline-date">August 15, 2024</span>
+                        </div>
+                        <div class="timeline-status">
+                            <span class="badge success">Completed</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-marker success">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>Regular Donation</h4>
+                            <p><strong>Community Health Center</strong></p>
+                            <p>Routine blood donation drive</p>
+                            <span class="timeline-date">June 10, 2024</span>
+                        </div>
+                        <div class="timeline-status">
+                            <span class="badge success">Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements -->
+            <div class="achievements-card">
+                <div class="card-header">
+                    <h3>Achievements</h3>
+                </div>
+                <div class="achievements-grid">
+                    <div class="achievement-item earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h4>First Donation</h4>
+                        <p>Completed your first blood donation</p>
+                    </div>
+                    <div class="achievement-item earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h4>Life Saver</h4>
+                        <p>Saved 10+ lives through donations</p>
+                    </div>
+                    <div class="achievement-item earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h4>Gold Donor</h4>
+                        <p>Completed 10+ donations</p>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h4>Hero Donor</h4>
+                        <p>Complete 25 donations</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 48%"></div>
+                        </div>
+                        <span class="progress-text">12/25</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/dashboard.js"></script>
+    <script src="../js/donor-dashboard.js"></script>
+</body>
+</html>
