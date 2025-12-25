@@ -88,14 +88,27 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="dashboard-header-content">
+                    <div class="dashboard-header-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="dashboard-header-info">
+                        <h1>Admin Dashboard</h1>
+                        <p>Monitor and manage the BloodConnect system</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stats Cards -->
             <div class="stats-grid">
-                <div class="stat-card primary">
+                <div class="stat-card primary interactive-card">
                     <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-number" data-target="1247">0</h3>
+                        <h3 class="stat-number counter" data-target="1247">0</h3>
                         <p class="stat-label">Total Donors</p>
                         <span class="stat-change positive">
                             <i class="fas fa-arrow-up"></i> +12% this month

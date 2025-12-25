@@ -524,3 +524,334 @@ if (typeof module !== 'undefined' && module.exports) {
         getCompatibleRecipients: window.getCompatibleRecipients
     };
 }
+// Enhanced Visual Functionality
+
+// Initialize enhanced visual features
+function initializeEnhancedVisuals() {
+    // Initialize progress rings
+    initializeProgressRings();
+    
+    // Initialize interactive cards
+    initializeInteractiveCards();
+    
+    // Initialize status indicators
+    initializeStatusIndicators();
+    
+    // Initialize chart animations
+    initializeChartAnimations();
+    
+    // Initialize floating action button
+    initializeFAB();
+}
+
+// Progress Ring Animations
+function initializeProgressRings() {
+    const progressRings = document.querySelectorAll('.progress-ring');
+    
+    const ringObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const ring = entry.target;
+                const progress = ring.getAttribute('data-progress') || 75;
+                
+                setTimeout(() => {
+                    ring.classList.add('animate');
+                    ring.style.setProperty('--progress', progress);
+                }, 200);
+                
+                ringObserver.unobserve(ring);
+            }
+        });
+    });
+    
+    progressRings.forEach(ring => ringObserver.observe(ring));
+}
+
+// Interactive Card Enhancements
+function initializeInteractiveCards() {
+    const cards = document.querySelectorAll('.interactive-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+        
+        // Add click ripple effect
+        card.addEventListener('click', function(e) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple-effect';
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+            
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+}
+
+// Status Indicator Animations
+function initializeStatusIndicators() {
+    const indicators = document.querySelectorAll('.status-indicator');
+    
+    indicators.forEach(indicator => {
+        if (indicator.classList.contains('urgent')) {
+            // Add pulsing animation for urgent status
+            setInterval(() => {
+                indicator.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    indicator.style.transform = 'scale(1)';
+                }, 300);
+            }, 2000);
+        }
+    });
+}
+
+// Chart Animation Enhancements
+function initializeChartAnimations() {
+    const charts = document.querySelectorAll('.chart-container');
+    
+    const chartObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const chart = entry.target;
+                chart.classList.add('animate-chart');
+                
+                // Animate chart elements
+                const chartElements = chart.querySelectorAll('.chart-bar, .chart-line, .chart-point');
+                chartElements.forEach((element, index) => {
+                    setTimeout(() => {
+                        element.classList.add('animate-in');
+                    }, index * 100);
+                });
+                
+                chartObserver.unobserve(chart);
+            }
+        });
+    });
+    
+    charts.forEach(chart => chartObserver.observe(chart));
+}
+
+// Floating Action Button
+function initializeFAB() {
+    const fab = document.querySelector('.fab');
+    if (!fab) return;
+    
+    let lastScrollTop = 0;
+    
+    window.addEventListener('scroll', function() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 200) {
+            // Scrolling down - hide FAB
+            fab.style.transform = 'translateY(100px)';
+        } else {
+            // Scrolling up - show FAB
+            fab.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollTop = scrollTop;
+    });
+    
+    // Add click animation
+    fab.addEventListener('click', function() {
+        this.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+            this.style.transform = 'scale(1)';
+        }, 150);
+    });
+}
+
+// Blood Drop Animation
+function createBloodDropAnimation(container) {
+    const drop = document.createElement('div');
+    drop.className = 'blood-drop-particle';
+    drop.innerHTML = '💧';
+    
+    const startX = Math.random() * container.offsetWidth;
+    const duration = 2000 + Math.random() * 1000;
+    
+    drop.style.left = startX + 'px';
+    drop.style.top = '-20px';
+    drop.style.position = 'absolute';
+    drop.style.fontSize = '20px';
+    drop.style.pointerEvents = 'none';
+    drop.style.zIndex = '1';
+    
+    container.appendChild(drop);
+    
+    // Animate the drop falling
+    drop.animate([
+        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+        { transform: `translateY(${container.offsetHeight + 40}px) rotate(360deg)`, opacity: 0 }
+    ], {
+        duration: duration,
+        easing: 'ease-in'
+    }).onfinish = () => {
+        drop.remove();
+    };
+}
+
+// Enhanced Notification System with Icons
+window.showEnhancedNotification = function(message, type = 'info', duration = 5000, icon = null) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type} enhanced`;
+    
+    const iconMap = {
+        success: icon || 'fa-check-circle',
+        error: icon || 'fa-exclamation-circle',
+        warning: icon || 'fa-exclamation-triangle',
+        info: icon || 'fa-info-circle',
+        emergency: icon || 'fa-exclamation'
+    };
+    
+    const notificationIcon = iconMap[type];
+    
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-icon ${type}">
+                <i class="fas ${notificationIcon}"></i>
+            </div>
+            <div class="notification-text">
+                <span>${message}</span>
+            </div>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    // Auto remove
+    if (duration > 0) {
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }, duration);
+    }
+    
+    return notification;
+};
+
+// Initialize enhanced visuals when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initializeEnhancedVisuals();
+});
+
+// Blood compatibility visual indicator
+window.showBloodCompatibility = function(donorType, recipientType) {
+    const compatible = getCompatibleDonors(recipientType).includes(donorType);
+    
+    const indicator = document.createElement('div');
+    indicator.className = `compatibility-indicator ${compatible ? 'compatible' : 'incompatible'}`;
+    indicator.innerHTML = `
+        <div class="compatibility-icon">
+            <i class="fas ${compatible ? 'fa-check' : 'fa-times'}"></i>
+        </div>
+        <div class="compatibility-text">
+            ${donorType} → ${recipientType}: ${compatible ? 'Compatible' : 'Incompatible'}
+        </div>
+    `;
+    
+    return indicator;
+};
+
+// Emergency alert system
+window.triggerEmergencyAlert = function(message, location = null) {
+    const alert = document.createElement('div');
+    alert.className = 'emergency-alert';
+    alert.innerHTML = `
+        <div class="emergency-alert-content">
+            <div class="emergency-alert-icon emergency-pulse">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="emergency-alert-text">
+                <h3>Emergency Blood Request</h3>
+                <p>${message}</p>
+                ${location ? `<p class="alert-location"><i class="fas fa-map-marker-alt"></i> ${location}</p>` : ''}
+            </div>
+            <div class="emergency-alert-actions">
+                <button class="btn btn-danger" onclick="respondToEmergency()">
+                    <i class="fas fa-heart"></i>
+                    Respond Now
+                </button>
+                <button class="btn btn-outline-light" onclick="this.closest('.emergency-alert').remove()">
+                    <i class="fas fa-times"></i>
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    // Auto-remove after 30 seconds for emergency alerts
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.remove();
+        }
+    }, 30000);
+    
+    return alert;
+};
+
+// Scroll to element with visual feedback
+window.scrollToElementWithFeedback = function(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    // Add highlight effect
+    element.classList.add('highlight-target');
+    
+    element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+    
+    // Remove highlight after animation
+    setTimeout(() => {
+        element.classList.remove('highlight-target');
+    }, 2000);
+};
+
+// Initialize blood drop particles for hero sections
+function initializeBloodDropParticles() {
+    const heroSections = document.querySelectorAll('.hero, .hero-section');
+    
+    heroSections.forEach(hero => {
+        if (hero.classList.contains('enable-particles')) {
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    createBloodDropAnimation(hero);
+                }
+            }, 3000);
+        }
+    });
+}
+
+// Initialize particles
+setTimeout(initializeBloodDropParticles, 2000);
