@@ -33,7 +33,7 @@
                 <button class="btn-icon" title="Settings">
                     <i class="fas fa-cog"></i>
                 </button>
-                <button class="btn-icon" title="Logout">
+                <button class="btn-icon" title="Logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -321,6 +321,16 @@
         </main>
     </div>
 
+    <script src="../js/auth.js"></script>
     <script src="../js/dashboard.js"></script>
+    <script>
+        // Initialize dashboard authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!protectDashboard('admin')) {
+                return; // Will redirect if not authenticated
+            }
+            initializeDashboardUser();
+        });
+    </script>
 </body>
 </html>

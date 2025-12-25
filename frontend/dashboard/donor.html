@@ -32,7 +32,7 @@
                 <button class="btn-icon" title="Settings">
                     <i class="fas fa-cog"></i>
                 </button>
-                <button class="btn-icon" title="Logout">
+                <button class="btn-icon" title="Logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -129,11 +129,11 @@
                         </button>
                     </div>
                     <div class="profile-info">
-                        <h2>John Doe</h2>
-                        <p>Registered Donor • ID: DON-2024-001</p>
+                        <h2 class="user-name">John Doe</h2>
+                        <p>Registered Donor • ID: <span class="donor-id">DON-2024-001</span></p>
                         <div class="blood-group-highlight">
                             <i class="fas fa-tint"></i>
-                            <span>O+ Universal Donor</span>
+                            <span><span class="blood-type">O+</span> Universal Donor</span>
                         </div>
                         <div class="contact-info">
                             <p><i class="fas fa-envelope"></i> john.doe@email.com</p>
@@ -558,7 +558,17 @@
         </main>
     </div>
 
+    <script src="../js/auth.js"></script>
     <script src="../js/dashboard.js"></script>
     <script src="../js/donor-dashboard.js"></script>
+    <script>
+        // Initialize dashboard authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!protectDashboard('donor')) {
+                return; // Will redirect if not authenticated
+            }
+            initializeDashboardUser();
+        });
+    </script>
 </body>
 </html>
