@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BloodConnect - Donate Blood. Save Lives.</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/animations.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -13,19 +12,19 @@
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-logo">
+            <div class="nav-brand">
                 <i class="fas fa-tint"></i>
                 <span>BloodConnect</span>
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#how-it-works">How It Works</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="auth/login.html" class="nav-btn">Login</a></li>
-                <li><a href="auth/register.html" class="nav-btn primary">Register</a></li>
-            </ul>
-            <div class="hamburger">
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="become-donor.html" class="nav-link">Become a Donor</a>
+                <a href="request-blood.html" class="nav-link">Request Blood</a>
+                <a href="auth/login.html" class="nav-link">Login</a>
+            </div>
+            <div class="nav-toggle">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -46,11 +45,11 @@
                     and make a difference with every donation.
                 </p>
                 <div class="hero-buttons fade-in-up delay-2">
-                    <a href="auth/register.html?role=donor" class="btn btn-primary">
+                    <a href="become-donor.html" class="btn btn-primary">
                         <i class="fas fa-heart"></i>
                         Become a Donor
                     </a>
-                    <a href="auth/register.html?role=patient" class="btn btn-secondary">
+                    <a href="request-blood.html" class="btn btn-secondary">
                         <i class="fas fa-hand-holding-medical"></i>
                         Request Blood
                     </a>
@@ -148,26 +147,42 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="footer-logo">
+                    <div class="footer-brand">
                         <i class="fas fa-tint"></i>
                         <span>BloodConnect</span>
                     </div>
                     <p>Connecting lives through blood donation. Every drop counts in saving lives.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
                 </div>
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
+                    <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#how-it-works">How It Works</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="become-donor.html">Become a Donor</a></li>
+                        <li><a href="request-blood.html">Request Blood</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h4>Contact Info</h4>
-                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
-                    <p><i class="fas fa-envelope"></i> info@bloodconnect.com</p>
-                    <p><i class="fas fa-map-marker-alt"></i> 123 Health St, Medical City</p>
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Emergency</h3>
+                    <div class="emergency-contact">
+                        <p><i class="fas fa-phone"></i> 1-800-BLOOD-911</p>
+                        <p><i class="fas fa-envelope"></i> emergency@bloodconnect.org</p>
+                    </div>
                 </div>
             </div>
             <div class="footer-bottom">

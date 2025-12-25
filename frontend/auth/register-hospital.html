@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Registration - BloodConnect</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-body">
+    <!-- Navigation -->
+    <nav class="auth-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-tint"></i>
+                <span>BloodConnect</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="login.html">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card large">
+            <div class="auth-header">
+                <div class="auth-icon hospital">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <h1>Hospital Registration</h1>
+                <p>Join the BloodConnect network to manage blood inventory and help save lives</p>
+            </div>
+
+            <div class="registration-progress">
+                <div class="progress-step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <span>Hospital Details</span>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-number">2</div>
+                    <span>Admin User</span>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-number">3</div>
+                    <span>Verification</span>
+                </div>
+            </div>
+
+            <form class="hospital-registration-form" id="hospitalRegistrationForm">
+                <!-- Step 1: Hospital Details -->
+                <div class="form-step active" data-step="1">
+                    <h3>Hospital Information</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hospitalName">Hospital Name *</label>
+                            <input type="text" id="hospitalName" name="hospitalName" class="form-control" required>
+                            <small class="form-help">Official registered name of your hospital</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="hospitalType">Hospital Type *</label>
+                            <select id="hospitalType" name="hospitalType" class="form-control" required>
+                                <option value="">Select Type</option>
+                                <option value="general-hospital">General Hospital</option>
+                                <option value="specialty-hospital">Specialty Hospital</option>
+                                <option value="blood-bank">Blood Bank</option>
+                                <option value="trauma-center">Trauma Center</option>
+                                <option value="community-health">Community Health Center</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="licenseNumber">Medical License Number *</label>
+                            <input type="text" id="licenseNumber" name="licenseNumber" class="form-control" required>
+                            <small class="form-help">Government issued medical facility license</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="registrationCertificate">Registration Certificate *</label>
+                            <input type="file" id="registrationCertificate" name="registrationCertificate" class="form-control file-input" accept=".pdf,.jpg,.jpeg,.png" required>
+                            <small class="form-help">Upload official registration document (PDF, JPG, PNG)</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hospitalAddress">Hospital Address *</label>
+                        <textarea id="hospitalAddress" name="hospitalAddress" class="form-control" rows="3" required placeholder="Complete address including city, state, and postal code"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="hospitalPhone">Contact Phone *</label>
+                            <input type="tel" id="hospitalPhone" name="hospitalPhone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="hospitalEmail">Official Email *</label>
+                            <input type="email" id="hospitalEmail" name="hospitalEmail" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bedCapacity">Bed Capacity</label>
+                            <input type="number" id="bedCapacity" name="bedCapacity" class="form-control" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyServices">Emergency Services</label>
+                            <select id="emergencyServices" name="emergencyServices" class="form-control">
+                                <option value="yes">Yes - 24/7 Emergency</option>
+                                <option value="limited">Limited Hours</option>
+                                <option value="no">No Emergency Services</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next Step
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Admin User Details -->
+                <div class="form-step" data-step="2">
+                    <h3>Administrator Account</h3>
+                    <p class="step-description">Create an admin account for your hospital to manage the system</p>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminFirstName">First Name *</label>
+                            <input type="text" id="adminFirstName" name="adminFirstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminLastName">Last Name *</label>
+                            <input type="text" id="adminLastName" name="adminLastName" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminEmail">Admin Email *</label>
+                            <input type="email" id="adminEmail" name="adminEmail" class="form-control" required>
+                            <small class="form-help">This will be used to login to the system</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPhone">Admin Phone *</label>
+                            <input type="tel" id="adminPhone" name="adminPhone" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminPosition">Position/Title *</label>
+                            <input type="text" id="adminPosition" name="adminPosition" class="form-control" required placeholder="e.g., Hospital Administrator, Blood Bank Manager">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminDepartment">Department</label>
+                            <select id="adminDepartment" name="adminDepartment" class="form-control">
+                                <option value="">Select Department</option>
+                                <option value="administration">Administration</option>
+                                <option value="blood-bank">Blood Bank</option>
+                                <option value="laboratory">Laboratory</option>
+                                <option value="emergency">Emergency Department</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="adminPassword">Password *</label>
+                            <input type="password" id="adminPassword" name="adminPassword" class="form-control" required minlength="8">
+                            <small class="form-help">Minimum 8 characters with letters and numbers</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password *</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i>
+                            Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">
+                            Next Step
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Verification & Submit -->
+                <div class="form-step" data-step="3">
+                    <h3>Verification & Terms</h3>
+                    <p class="step-description">Review your information and agree to our terms</p>
+                    
+                    <div class="verification-summary">
+                        <div class="summary-section">
+                            <h4>Hospital Information</h4>
+                            <div class="summary-item">
+                                <span class="label">Hospital Name:</span>
+                                <span class="value" id="summaryHospitalName">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Type:</span>
+                                <span class="value" id="summaryHospitalType">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">License Number:</span>
+                                <span class="value" id="summaryLicenseNumber">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Email:</span>
+                                <span class="value" id="summaryHospitalEmail">-</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-section">
+                            <h4>Administrator</h4>
+                            <div class="summary-item">
+                                <span class="label">Name:</span>
+                                <span class="value" id="summaryAdminName">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Email:</span>
+                                <span class="value" id="summaryAdminEmail">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Position:</span>
+                                <span class="value" id="summaryAdminPosition">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-section">
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeCompliance" name="agreeCompliance" required>
+                                <span class="checkmark"></span>
+                                I confirm that our hospital complies with all medical regulations and blood safety standards
+                            </label>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="agreeVerification" name="agreeVerification" required>
+                                <span class="checkmark"></span>
+                                I understand that this registration requires admin verification before activation
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="approval-notice">
+                        <div class="notice-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="notice-content">
+                            <h4>Approval Process</h4>
+                            <p>After submission, your registration will be reviewed by our administrators. This process typically takes 1-2 business days. You will receive an email notification once your hospital is approved and can access the dashboard.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                            <i class="fas fa-arrow-left"></i>
+                            Previous
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i>
+                            Submit Registration
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header success">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Registration Submitted Successfully!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Thank you for registering with BloodConnect. Your hospital registration has been submitted and is now pending admin approval.</p>
+                
+                <div class="next-steps">
+                    <h4>What happens next?</h4>
+                    <div class="step-item">
+                        <i class="fas fa-search"></i>
+                        <span>Our team will verify your hospital details and documents</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>You'll receive an email notification about the approval status</span>
+                    </div>
+                    <div class="step-item">
+                        <i class="fas fa-key"></i>
+                        <span>Once approved, you can login and access your hospital dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="contact-info">
+                    <p><strong>Questions?</strong> Contact us at <a href="mailto:support@bloodconnect.com">support@bloodconnect.com</a></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="redirectToLogin()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Go to Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/hospital-registration.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+</html>

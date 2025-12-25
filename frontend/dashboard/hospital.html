@@ -179,6 +179,10 @@
                 <div class="section-header">
                     <h3>Blood Inventory Management</h3>
                     <div class="section-actions">
+                        <button class="btn btn-danger" onclick="showBloodRequestModal()">
+                            <i class="fas fa-hand-holding-medical"></i>
+                            Request Blood
+                        </button>
                         <button class="btn btn-primary" onclick="showAddBloodModal()">
                             <i class="fas fa-plus"></i>
                             Add Blood Units
@@ -288,6 +292,194 @@
                         <div class="stock-actions">
                             <button class="btn-sm danger">Request</button>
                             <button class="btn-sm secondary">History</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Request Management -->
+            <div class="blood-request-management">
+                <div class="request-tabs">
+                    <button class="tab-btn active" data-tab="incoming">
+                        <i class="fas fa-inbox"></i>
+                        Incoming Requests
+                        <span class="tab-badge">3</span>
+                    </button>
+                    <button class="tab-btn" data-tab="outgoing">
+                        <i class="fas fa-paper-plane"></i>
+                        My Requests
+                        <span class="tab-badge">2</span>
+                    </button>
+                </div>
+
+                <!-- Incoming Requests Tab -->
+                <div class="tab-content active" id="incoming-tab">
+                    <div class="card-header">
+                        <h3>Blood Requests from Other Hospitals</h3>
+                        <span class="badge warning">3 pending approval</span>
+                    </div>
+                    <div class="request-list">
+                        <div class="request-item incoming urgent">
+                            <div class="request-info">
+                                <div class="hospital-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div class="request-details">
+                                    <h4>Metro Medical Center</h4>
+                                    <p><strong>O- Blood • 5 units</strong></p>
+                                    <p>Emergency: Multiple trauma patients</p>
+                                    <span class="request-time">15 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="request-priority">
+                                <span class="priority-badge emergency">Emergency</span>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-sm success" onclick="approveBloodRequest('req-001', 'Metro Medical Center', 'O-', 5)">
+                                    <i class="fas fa-check"></i>
+                                    Approve & Transfer
+                                </button>
+                                <button class="btn-sm danger" onclick="rejectBloodRequest('req-001')">
+                                    <i class="fas fa-times"></i>
+                                    Reject
+                                </button>
+                                <button class="btn-sm info" onclick="viewRequestDetails('req-001')">
+                                    <i class="fas fa-eye"></i>
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="request-item incoming">
+                            <div class="request-info">
+                                <div class="hospital-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div class="request-details">
+                                    <h4>Regional Hospital</h4>
+                                    <p><strong>A+ Blood • 3 units</strong></p>
+                                    <p>Scheduled surgery preparation</p>
+                                    <span class="request-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="request-priority">
+                                <span class="priority-badge normal">Normal</span>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-sm success" onclick="approveBloodRequest('req-002', 'Regional Hospital', 'A+', 3)">
+                                    <i class="fas fa-check"></i>
+                                    Approve & Transfer
+                                </button>
+                                <button class="btn-sm danger" onclick="rejectBloodRequest('req-002')">
+                                    <i class="fas fa-times"></i>
+                                    Reject
+                                </button>
+                                <button class="btn-sm info" onclick="viewRequestDetails('req-002')">
+                                    <i class="fas fa-eye"></i>
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="request-item incoming">
+                            <div class="request-info">
+                                <div class="hospital-icon">
+                                    <i class="fas fa-hospital"></i>
+                                </div>
+                                <div class="request-details">
+                                    <h4>Community Health Center</h4>
+                                    <p><strong>B+ Blood • 2 units</strong></p>
+                                    <p>Patient transfusion requirement</p>
+                                    <span class="request-time">4 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="request-priority">
+                                <span class="priority-badge urgent">Urgent</span>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-sm success" onclick="approveBloodRequest('req-003', 'Community Health Center', 'B+', 2)">
+                                    <i class="fas fa-check"></i>
+                                    Approve & Transfer
+                                </button>
+                                <button class="btn-sm danger" onclick="rejectBloodRequest('req-003')">
+                                    <i class="fas fa-times"></i>
+                                    Reject
+                                </button>
+                                <button class="btn-sm info" onclick="viewRequestDetails('req-003')">
+                                    <i class="fas fa-eye"></i>
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Outgoing Requests Tab -->
+                <div class="tab-content" id="outgoing-tab">
+                    <div class="card-header">
+                        <h3>My Blood Requests</h3>
+                        <button class="btn btn-primary" onclick="showBloodRequestModal()">
+                            <i class="fas fa-plus"></i>
+                            New Request
+                        </button>
+                    </div>
+                    <div class="request-list">
+                        <div class="request-item outgoing">
+                            <div class="request-info">
+                                <div class="request-icon pending">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="request-details">
+                                    <h4>AB- Blood Request</h4>
+                                    <p><strong>To: Central Blood Bank • 4 units</strong></p>
+                                    <p>Critical patient - rare blood type needed</p>
+                                    <span class="request-time">30 minutes ago</span>
+                                </div>
+                            </div>
+                            <div class="request-status">
+                                <span class="status-badge pending">Pending Approval</span>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-sm info" onclick="trackRequest('out-001')">
+                                    <i class="fas fa-search"></i>
+                                    Track
+                                </button>
+                                <button class="btn-sm warning" onclick="editRequest('out-001')">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                <button class="btn-sm danger" onclick="cancelRequest('out-001')">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="request-item outgoing">
+                            <div class="request-info">
+                                <div class="request-icon approved">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="request-details">
+                                    <h4>O+ Blood Request</h4>
+                                    <p><strong>From: Metro Medical Center • 6 units</strong></p>
+                                    <p>Emergency surgery requirements</p>
+                                    <span class="request-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="request-status">
+                                <span class="status-badge approved">Approved - In Transit</span>
+                            </div>
+                            <div class="request-actions">
+                                <button class="btn-sm success" onclick="confirmReceived('out-002')">
+                                    <i class="fas fa-check-double"></i>
+                                    Confirm Received
+                                </button>
+                                <button class="btn-sm info" onclick="trackRequest('out-002')">
+                                    <i class="fas fa-truck"></i>
+                                    Track Delivery
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

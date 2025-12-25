@@ -15,6 +15,15 @@ function initializePatientDashboard() {
     
     // Initialize emergency features
     initializeEmergencyFeatures();
+    
+    // Initialize blood search
+    initializeBloodSearch();
+    
+    // Initialize request history
+    initializeRequestHistory();
+    
+    // Initialize profile management
+    initializeProfileManagement();
 }
 
 // Request Form
@@ -393,6 +402,448 @@ function updateHospitalAvailability() {
 // Emergency Features
 function initializeEmergencyFeatures() {
     // Emergency request button is handled by onclick in HTML
+}
+
+// Emergency Reason Toggle
+function toggleEmergencyReason() {
+    const prioritySelect = document.getElementById('prioritySelect');
+    const emergencyReasonGroup = document.getElementById('emergencyReasonGroup');
+    const emergencyReason = document.getElementById('emergencyReason');
+    
+    if (prioritySelect.value === 'emergency') {
+        emergencyReasonGroup.style.display = 'block';
+        emergencyReason.setAttribute('required', 'required');
+    } else {
+        emergencyReasonGroup.style.display = 'none';
+        emergencyReason.removeAttribute('required');
+        emergencyReason.value = '';
+    }
+}
+
+// Blood Search System
+function initializeBloodSearch() {
+    // Initialize search functionality
+    const searchButton = document.querySelector('.blood-search-section .btn-primary');
+    if (searchButton) {
+        searchButton.addEventListener('click', searchBloodAvailability);
+    }
+}
+
+function searchBloodAvailability() {
+    const bloodType = document.getElementById('searchBloodType').value;
+    const location = document.getElementById('locationPreference').value;
+    const radius = document.getElementById('searchRadius').value;
+    
+    if (!bloodType) {
+        showNotification('Please select a blood type to search', 'warning');
+        return;
+    }
+    
+    // Show loading state
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = `
+        <div class="search-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Searching for ${bloodType} blood in nearby hospitals...</p>
+        </div>
+    `;
+    
+    // Simulate search results
+    setTimeout(() => {
+        displaySearchResults(bloodType, location, radius);
+    }, 2000);
+}
+
+function displaySearchResults(bloodType, location, radius) {
+    const resultsContainer = document.getElementById('searchResults');
+    
+    // Mock search results based on search parameters
+    const searchResults = [
+        {
+            hospital: 'City General Hospital',
+            distance: '2.3 km',
+            availability: 45,
+            status: 'available',
+            phone: '+1 (555) 123-4567',
+            address: '123 Medical Center Dr'
+        },
+        {
+            hospital: 'Metro Medical Center',
+            distance: '4.1 km',
+            availability: 12,
+            status: 'low',
+            phone: '+1 (555) 987-6543',
+            address: '456 Health Ave'
+        },
+        {
+            hospital: 'Regional Hospital',
+            distance: '6.8 km',
+            availability: 0,
+            status: 'unavailable',
+            phone: '+1 (555) 456-7890',
+            address: '789 Care Blvd'
+        }
+    ];
+    
+    resultsContainer.innerHTML = `
+        <div class="search-results-header">
+            <h4>Search Results for ${bloodType} Blood</h4>
+            <p>Found ${searchResults.filter(r => r.availability > 0).length} hospitals with available blood</p>
+        </div>
+        <div class="results-list">
+            ${searchResults.map(result => `
+                <div class="result-item ${result.status}">
+                    <div class="result-header">
+                        <div class="hospital-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <div class="hospital-info">
+                            <h5>${result.hospital}</h5>
+                            <p>${result.address}</p>
+                            <span class="distance">
+                                <i class="fas fa-map-marker-alt"></i>
+                                ${result.distance}
+                            </span>
+                        </div>
+                        <div class="availability-info">
+                            <div class="availability-count ${result.status}">
+                                ${result.availability} units
+                            </div>
+                            <div class="availability-status ${result.status}">
+                                ${result.status === 'available' ? 'Available' : 
+                                  result.status === 'low' ? 'Low Stock' : 'Unavailable'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="result-actions">
+                        ${result.availability > 0 ? `
+                            <button class="btn-sm primary" onclick="requestFromHospital('${result.hospital}', '${bloodType}')">
+                                <i class="fas fa-hand-holding-medical"></i>
+                                Request Blood
+                            </button>
+                        ` : ''}
+                        <button class="btn-sm secondary" onclick="callHospital('${result.phone}')">
+                            <i class="fas fa-phone"></i>
+                            Call Hospital
+                        </button>
+                        <button class="btn-sm info" onclick="getDirections('${result.address}')">
+                            <i class="fas fa-directions"></i>
+                            Directions
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function requestFromHospital(hospitalName, bloodType) {
+    // Pre-fill the quick request form
+    document.querySelector('select[name="bloodType"]').value = bloodType;
+    document.querySelector('select[name="hospital"]').value = hospitalName.toLowerCase().replace(/\s+/g, '-');
+    
+    // Scroll to request form
+    document.querySelector('.quick-request-section').scrollIntoView({ behavior: 'smooth' });
+    
+    showNotification(`Pre-filled request form for ${bloodType} blood at ${hospitalName}`, 'info');
+}
+
+function callHospital(phone) {
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|BlackBerry)/)) {
+        window.location.href = `tel:${phone}`;
+    } else {
+        showNotification(`Hospital phone: ${phone}`, 'info');
+    }
+}
+
+function getDirections(address) {
+    const encodedAddress = encodeURIComponent(address);
+    window.open(`https://maps.google.com/maps?q=${encodedAddress}`, '_blank');
+}
+
+// Request History Management
+function initializeRequestHistory() {
+    // Initialize re-submit functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.history-actions .btn-sm')) {
+            const btn = e.target.closest('.btn-sm');
+            if (btn.textContent.includes('Re-submit')) {
+                const requestId = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                reSubmitRequest(requestId);
+            }
+        }
+    });
+}
+
+function reSubmitRequest(requestId) {
+    // Get historical request data (mock data)
+    const historicalRequests = {
+        'REQ-2024-003': {
+            bloodType: 'A+',
+            units: '3',
+            hospital: 'city-general',
+            priority: 'emergency',
+            reason: 'Emergency surgery requirements',
+            emergencyReason: 'surgery'
+        },
+        'REQ-2024-001': {
+            bloodType: 'A+',
+            units: '2',
+            hospital: 'metro-medical',
+            priority: 'routine',
+            reason: 'Scheduled surgery preparation'
+        },
+        'REQ-2024-002': {
+            bloodType: 'A+',
+            units: '1',
+            hospital: 'regional-hospital',
+            priority: 'routine',
+            reason: 'Routine transfusion'
+        }
+    };
+    
+    const requestData = historicalRequests[requestId];
+    if (requestData) {
+        // Pre-fill the form with historical data
+        document.querySelector('select[name="bloodType"]').value = requestData.bloodType;
+        document.querySelector('select[name="units"]').value = requestData.units;
+        document.querySelector('select[name="hospital"]').value = requestData.hospital;
+        document.querySelector('select[name="priority"]').value = requestData.priority;
+        document.querySelector('textarea[name="reason"]').value = requestData.reason;
+        
+        if (requestData.priority === 'emergency' && requestData.emergencyReason) {
+            toggleEmergencyReason();
+            document.getElementById('emergencyReason').value = requestData.emergencyReason;
+        }
+        
+        // Scroll to form
+        document.querySelector('.quick-request-section').scrollIntoView({ behavior: 'smooth' });
+        
+        showNotification(`Form pre-filled with data from ${requestId}`, 'success');
+    }
+}
+
+// Request Cancellation
+function cancelRequest(requestId) {
+    showConfirmationModal(
+        'Cancel Blood Request',
+        'Are you sure you want to cancel this blood request? This action cannot be undone.',
+        () => {
+            // Update request status
+            const requestItem = document.querySelector('.request-item.active');
+            if (requestItem) {
+                const statusIndicator = requestItem.querySelector('.request-status-indicator');
+                statusIndicator.className = 'request-status-indicator cancelled';
+                statusIndicator.innerHTML = '<i class="fas fa-times-circle"></i>';
+                
+                const progressSteps = requestItem.querySelectorAll('.progress-steps .step');
+                progressSteps.forEach(step => {
+                    step.classList.remove('active', 'completed');
+                    step.classList.add('cancelled');
+                });
+                
+                const progressFill = requestItem.querySelector('.progress-fill');
+                progressFill.style.background = '#ef4444';
+                
+                // Update actions
+                const actions = requestItem.querySelector('.request-actions');
+                actions.innerHTML = `
+                    <button class="btn-sm secondary" disabled>
+                        <i class="fas fa-times-circle"></i>
+                        Cancelled
+                    </button>
+                    <button class="btn-sm success" onclick="reSubmitRequest('${requestId}')">
+                        <i class="fas fa-redo"></i>
+                        Re-submit
+                    </button>
+                `;
+                
+                requestItem.classList.remove('active');
+                requestItem.classList.add('cancelled');
+            }
+            
+            showNotification('Blood request cancelled successfully', 'info');
+            updateActiveRequestsCount(-1);
+        }
+    );
+}
+
+// Profile Management
+function initializeProfileManagement() {
+    // Profile management is handled by modal functions
+}
+
+function showEditProfileModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Edit Profile</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="edit-profile-form">
+                    <div class="form-section">
+                        <h4>Personal Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>First Name</label>
+                                <input type="text" class="form-control" name="firstName" value="Jane" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name</label>
+                                <input type="text" class="form-control" name="lastName" value="Smith" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Date of Birth</label>
+                                <input type="date" class="form-control" name="dateOfBirth" value="1985-03-15" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Gender</label>
+                                <select class="form-control" name="gender" required>
+                                    <option value="female" selected>Female</option>
+                                    <option value="male">Male</option>
+                                    <option value="other">Other</option>
+                                    <option value="prefer-not-to-say">Prefer not to say</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Blood Type</label>
+                            <select class="form-control" name="bloodType" required>
+                                <option value="A+" selected>A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>Contact Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control" name="email" value="jane.smith@email.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" class="form-control" name="phone" value="+1 (555) 123-4567" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Address</label>
+                            <textarea class="form-control" name="address" rows="3" required>123 Main St, City Center</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Emergency Contact</label>
+                            <input type="text" class="form-control" name="emergencyContact" value="John Smith - +1 (555) 987-6543" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4>Medical Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Medical ID</label>
+                                <input type="text" class="form-control" name="medicalId" value="MED-2024-001">
+                            </div>
+                            <div class="form-group">
+                                <label>Insurance Provider</label>
+                                <input type="text" class="form-control" name="insurance" value="HealthCare Plus">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Known Allergies</label>
+                            <textarea class="form-control" name="allergies" rows="2" placeholder="List any known allergies...">None reported</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Medical Conditions</label>
+                            <textarea class="form-control" name="conditions" rows="2" placeholder="List any medical conditions...">None reported</textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    `;
+    
+    showModal(modal);
+}
+
+function saveProfile() {
+    const form = document.querySelector('.edit-profile-form');
+    const formData = new FormData(form);
+    
+    // Update profile display (in a real app, this would be an API call)
+    const profileSections = document.querySelectorAll('.profile-section');
+    
+    // Update personal information
+    const personalSection = profileSections[0];
+    personalSection.querySelector('.profile-item:nth-child(1) .value').textContent = 
+        `${formData.get('firstName')} ${formData.get('lastName')}`;
+    personalSection.querySelector('.profile-item:nth-child(2) .value').textContent = 
+        formData.get('bloodType');
+    
+    // Update contact information
+    const contactSection = profileSections[1];
+    contactSection.querySelector('.profile-item:nth-child(1) .value').textContent = 
+        formData.get('email');
+    contactSection.querySelector('.profile-item:nth-child(2) .value').textContent = 
+        formData.get('phone');
+    contactSection.querySelector('.profile-item:nth-child(3) .value').textContent = 
+        formData.get('address');
+    contactSection.querySelector('.profile-item:nth-child(4) .value').textContent = 
+        formData.get('emergencyContact');
+    
+    closeModal();
+    showNotification('Profile updated successfully!', 'success');
+}
+
+function showConfirmationModal(title, message, onConfirm) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3>${title}</h3>
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>${message}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Cancel</button>
+                <button class="btn btn-danger confirm-action">Confirm</button>
+            </div>
+        </div>
+    `;
+
+    modal.addEventListener('click', function(e) {
+        if (e.target.classList.contains('confirm-action')) {
+            onConfirm();
+            closeModal();
+        }
+    });
+
+    showModal(modal);
 }
 
 function showEmergencyRequestModal() {
@@ -1103,6 +1554,371 @@ const patientStyles = `
         }
     }
 
+    /* Blood Search Section */
+    .blood-search-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .search-container {
+        padding: 2rem;
+    }
+
+    .search-form .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .search-results {
+        margin-top: 2rem;
+    }
+
+    .search-loading {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+    }
+
+    .search-loading i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        color: #3b82f6;
+    }
+
+    .search-results-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .search-results-header h4 {
+        margin-bottom: 0.5rem;
+        color: #1f2937;
+    }
+
+    .results-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .result-item {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .result-item:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .result-item.available {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.02);
+    }
+
+    .result-item.low {
+        border-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.02);
+    }
+
+    .result-item.unavailable {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.02);
+        opacity: 0.7;
+    }
+
+    .result-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .result-header .hospital-icon {
+        width: 50px;
+        height: 50px;
+        background: #3b82f6;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .result-header .hospital-info {
+        flex: 1;
+    }
+
+    .result-header .hospital-info h5 {
+        margin-bottom: 0.25rem;
+        color: #1f2937;
+    }
+
+    .result-header .hospital-info p {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .distance {
+        color: #9ca3af;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .availability-info {
+        text-align: right;
+    }
+
+    .availability-count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+
+    .availability-count.available {
+        color: #10b981;
+    }
+
+    .availability-count.low {
+        color: #f59e0b;
+    }
+
+    .availability-count.unavailable {
+        color: #ef4444;
+    }
+
+    .availability-status {
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+
+    .availability-status.available {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+    }
+
+    .availability-status.low {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+    }
+
+    .availability-status.unavailable {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    .result-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Emergency Reason Field */
+    .emergency-warning {
+        color: #f59e0b;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Request History Section */
+    .request-history-section, .profile-management-section {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 2rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .history-timeline {
+        padding: 2rem;
+    }
+
+    .history-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .history-item:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .history-item.completed {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.02);
+    }
+
+    .history-item.cancelled {
+        border-color: #ef4444;
+        background: rgba(239, 68, 68, 0.02);
+    }
+
+    .history-status-indicator {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: white;
+        flex-shrink: 0;
+    }
+
+    .history-item.completed .history-status-indicator {
+        background: #10b981;
+    }
+
+    .history-item.cancelled .history-status-indicator {
+        background: #ef4444;
+    }
+
+    .history-details {
+        flex: 1;
+    }
+
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .history-header h4 {
+        margin: 0;
+        color: #1f2937;
+    }
+
+    .history-id {
+        font-size: 0.875rem;
+        color: #6b7280;
+        font-weight: 600;
+    }
+
+    .history-info p {
+        margin-bottom: 0.25rem;
+        color: #4b5563;
+        font-size: 0.875rem;
+    }
+
+    .history-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-end;
+    }
+
+    /* Profile Management Section */
+    .profile-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .profile-section h4 {
+        margin-bottom: 1rem;
+        color: #1f2937;
+        font-weight: 600;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+    }
+
+    .profile-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .profile-item .label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .profile-item .value {
+        color: #1f2937;
+        font-weight: 500;
+        text-align: right;
+        max-width: 60%;
+        word-break: break-word;
+    }
+
+    /* Form Sections in Modals */
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .form-section h4 {
+        margin-bottom: 1rem;
+        color: #1f2937;
+        font-weight: 600;
+    }
+
+    /* Request Status Updates */
+    .request-item.cancelled {
+        opacity: 0.8;
+    }
+
+    .request-item.cancelled .request-status-indicator {
+        background: #ef4444;
+    }
+
+    .request-item.cancelled .progress-steps .step {
+        color: #ef4444;
+    }
+
+    .request-item.cancelled .progress-steps .step.cancelled {
+        color: #ef4444;
+        text-decoration: line-through;
+    }
+
+    @media (max-width: 1024px) {
+        .search-form .form-row {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .search-form .form-row .form-group:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .profile-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     @media (max-width: 768px) {
         .profile-header {
             flex-direction: column;
@@ -1118,24 +1934,32 @@ const patientStyles = `
             grid-template-columns: 1fr;
         }
 
-        .request-item {
+        .search-form .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .request-item, .history-item {
             flex-direction: column;
             gap: 1rem;
         }
 
-        .request-actions {
+        .request-actions, .history-actions {
             flex-direction: row;
             justify-content: center;
         }
 
-        .hospital-header {
+        .hospital-header, .result-header {
             flex-direction: column;
             align-items: center;
             text-align: center;
         }
 
-        .hospital-status {
+        .hospital-status, .availability-info {
             margin-top: 0.5rem;
+        }
+
+        .result-actions {
+            justify-content: center;
         }
     }
 `;

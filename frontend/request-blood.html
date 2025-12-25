@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood - BloodConnect</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-tint"></i>
+                <span>BloodConnect</span>
+            </div>
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="become-donor.html" class="nav-link">Become a Donor</a>
+                <a href="request-blood.html" class="nav-link active">Request Blood</a>
+                <a href="auth/login.html" class="nav-link">Login</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section request-hero">
+        <div class="hero-content">
+            <div class="container">
+                <h1>Request Blood</h1>
+                <p class="hero-subtitle">Get the blood you need when you need it most</p>
+            </div>
+        </div>
+        <div class="hero-overlay"></div>
+    </section>
+
+    <!-- Emergency Banner -->
+    <section class="emergency-banner">
+        <div class="container">
+            <div class="emergency-content">
+                <div class="emergency-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="emergency-text">
+                    <h3>Medical Emergency?</h3>
+                    <p>For immediate blood needs, call our 24/7 emergency hotline</p>
+                </div>
+                <div class="emergency-action">
+                    <a href="tel:1-800-BLOOD-911" class="btn btn-danger btn-lg">
+                        <i class="fas fa-phone"></i>
+                        1-800-BLOOD-911
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Request Options -->
+    <section class="request-options-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>How would you like to request blood?</h2>
+                <p>Choose the option that best fits your situation</p>
+            </div>
+            <div class="request-options">
+                <div class="request-option" onclick="showRequestForm('emergency')">
+                    <div class="option-icon emergency">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Emergency Request</h3>
+                    <p>Immediate blood needed for critical medical situations</p>
+                    <ul>
+                        <li>Instant notification to nearby donors</li>
+                        <li>Priority processing</li>
+                        <li>24/7 support</li>
+                        <li>Real-time tracking</li>
+                    </ul>
+                    <div class="option-badge emergency">URGENT</div>
+                </div>
+
+                <div class="request-option" onclick="showRequestForm('scheduled')">
+                    <div class="option-icon scheduled">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Scheduled Request</h3>
+                    <p>Plan ahead for upcoming medical procedures</p>
+                    <ul>
+                        <li>Schedule in advance</li>
+                        <li>Coordinate with hospitals</li>
+                        <li>Preparation time</li>
+                        <li>Confirmation notifications</li>
+                    </ul>
+                    <div class="option-badge scheduled">PLANNED</div>
+                </div>
+
+                <div class="request-option" onclick="showRequestForm('ongoing')">
+                    <div class="option-icon ongoing">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3>Ongoing Treatment</h3>
+                    <p>Regular blood needs for chronic conditions</p>
+                    <ul>
+                        <li>Recurring requests</li>
+                        <li>Treatment schedule coordination</li>
+                        <li>Medical team integration</li>
+                        <li>Progress tracking</li>
+                    </ul>
+                    <div class="option-badge ongoing">RECURRING</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blood Availability Checker -->
+    <section class="availability-checker-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Check Blood Availability</h2>
+                <p>See what's available in your area before making a request</p>
+            </div>
+            <div class="availability-checker">
+                <div class="checker-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Blood Type Needed</label>
+                            <select class="form-control" id="checkBloodType">
+                                <option value="">Select Blood Type</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Your Location</label>
+                            <input type="text" class="form-control" id="checkLocation" placeholder="Enter city or zip code">
+                        </div>
+                        <div class="form-group">
+                            <label>Search Radius</label>
+                            <select class="form-control" id="checkRadius">
+                                <option value="10">Within 10 miles</option>
+                                <option value="25">Within 25 miles</option>
+                                <option value="50">Within 50 miles</option>
+                                <option value="100">Within 100 miles</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" onclick="checkAvailability()">
+                                <i class="fas fa-search"></i>
+                                Check Availability
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="availability-results" id="availabilityResults">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Request Process -->
+    <section class="request-process-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Simple steps to get the blood you need</p>
+            </div>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Submit Request</h3>
+                        <p>Fill out our secure form with your medical needs and contact information</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Medical Verification</h3>
+                        <p>Our medical team reviews and verifies your request for safety and accuracy</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Donor Matching</h3>
+                        <p>We match you with compatible donors and nearby blood banks</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Coordination</h3>
+                        <p>We coordinate with hospitals and donors to fulfill your request</p>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Blood Delivery</h3>
+                        <p>Blood is safely delivered to your hospital or treatment center</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Requirements Section -->
+    <section class="requirements-section">
+        <div class="container">
+            <div class="requirements-content">
+                <div class="requirements-info">
+                    <h2>Request Requirements</h2>
+                    <p>To ensure the safety and efficiency of our blood request process, please have the following information ready:</p>
+                    
+                    <div class="requirement-categories">
+                        <div class="requirement-category">
+                            <h3><i class="fas fa-user-md"></i> Medical Information</h3>
+                            <ul>
+                                <li>Doctor's prescription or medical order</li>
+                                <li>Blood type (if known)</li>
+                                <li>Number of units needed</li>
+                                <li>Medical condition or reason for transfusion</li>
+                                <li>Urgency level and timeline</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="requirement-category">
+                            <h3><i class="fas fa-hospital"></i> Hospital Information</h3>
+                            <ul>
+                                <li>Hospital or treatment center name</li>
+                                <li>Hospital contact information</li>
+                                <li>Attending physician details</li>
+                                <li>Department or unit information</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="requirement-category">
+                            <h3><i class="fas fa-id-card"></i> Patient Information</h3>
+                            <ul>
+                                <li>Patient's full name and date of birth</li>
+                                <li>Contact information</li>
+                                <li>Emergency contact details</li>
+                                <li>Insurance information (if applicable)</li>
+                                <li>Medical record number</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="requirements-sidebar">
+                    <div class="help-card">
+                        <div class="help-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h3>Need Help?</h3>
+                        <p>Our support team is available 24/7 to assist with your blood request</p>
+                        <div class="help-contacts">
+                            <a href="tel:1-800-BLOOD-911" class="help-contact">
+                                <i class="fas fa-phone"></i>
+                                1-800-BLOOD-911
+                            </a>
+                            <a href="mailto:support@bloodconnect.org" class="help-contact">
+                                <i class="fas fa-envelope"></i>
+                                support@bloodconnect.org
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>Important Notes</h3>
+                        <ul>
+                            <li>All requests are reviewed by medical professionals</li>
+                            <li>Emergency requests are processed immediately</li>
+                            <li>We maintain strict privacy and confidentiality</li>
+                            <li>Blood is tested and screened for safety</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Stories -->
+    <section class="success-stories-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Success Stories</h2>
+                <p>Real stories from people who received life-saving blood through BloodConnect</p>
+            </div>
+            <div class="stories-grid">
+                <div class="story-card">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1559757175-0eb30cd8c063?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Success Story" class="img-fluid">
+                    </div>
+                    <div class="story-content">
+                        <h3>Sarah's Emergency Surgery</h3>
+                        <p>"When I needed emergency surgery after a car accident, BloodConnect helped coordinate the blood I needed within 30 minutes. The doctors said it saved my life."</p>
+                        <div class="story-author">
+                            <strong>Sarah M.</strong>
+                            <span>Accident Survivor</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="story-card">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Success Story" class="img-fluid">
+                    </div>
+                    <div class="story-content">
+                        <h3>Michael's Cancer Treatment</h3>
+                        <p>"During my chemotherapy, I needed regular blood transfusions. BloodConnect made the process seamless and gave me peace of mind during a difficult time."</p>
+                        <div class="story-author">
+                            <strong>Michael R.</strong>
+                            <span>Cancer Survivor</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="story-card">
+                    <div class="story-image">
+                        <img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Success Story" class="img-fluid">
+                    </div>
+                    <div class="story-content">
+                        <h3>Emma's Birth Complications</h3>
+                        <p>"When complications arose during childbirth, BloodConnect's emergency response team helped coordinate the blood transfusion that saved both my life and my baby's."</p>
+                        <div class="story-author">
+                            <strong>Emma L.</strong>
+                            <span>New Mother</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Request Blood?</h2>
+                <p>Get started with your blood request today</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-primary btn-lg" onclick="showRequestForm('emergency')">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Emergency Request
+                    </button>
+                    <button class="btn btn-outline-primary btn-lg" onclick="showRequestForm('scheduled')">
+                        <i class="fas fa-calendar-alt"></i>
+                        Schedule Request
+                    </button>
+                </div>
+                <p class="cta-note">
+                    <i class="fas fa-info-circle"></i>
+                    Already have an account? <a href="auth/login.html">Sign in</a> to access your dashboard
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Request Form Modal -->
+    <div class="modal-overlay" id="requestModal" style="display: none;">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="requestModalTitle">Blood Request Form</h3>
+                <button class="modal-close" onclick="closeRequestModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="request-form" id="bloodRequestForm">
+                    <!-- Form content will be dynamically populated -->
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-brand">
+                        <i class="fas fa-tint"></i>
+                        <span>BloodConnect</span>
+                    </div>
+                    <p>Connecting lives through the gift of blood donation. Every drop counts, every donor matters.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="become-donor.html">Become a Donor</a></li>
+                        <li><a href="request-blood.html">Request Blood</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Emergency</h3>
+                    <div class="emergency-contact">
+                        <p><i class="fas fa-phone"></i> 1-800-BLOOD-911</p>
+                        <p><i class="fas fa-envelope"></i> emergency@bloodconnect.org</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BloodConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/request-blood.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
