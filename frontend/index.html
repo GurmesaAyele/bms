@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodConnect - Donate Blood. Save Lives.</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-tint"></i>
+                <span>BloodConnect</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="auth/login.html" class="nav-btn">Login</a></li>
+                <li><a href="auth/register.html" class="nav-btn primary">Register</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title fade-in-up">
+                    Donate Blood. Save Lives.<br>
+                    <span class="highlight">Every Drop Matters.</span>
+                </h1>
+                <p class="hero-subtitle fade-in-up delay-1">
+                    Join our life-saving community. Connect donors with those in need 
+                    and make a difference with every donation.
+                </p>
+                <div class="hero-buttons fade-in-up delay-2">
+                    <a href="auth/register.html?role=donor" class="btn btn-primary">
+                        <i class="fas fa-heart"></i>
+                        Become a Donor
+                    </a>
+                    <a href="auth/register.html?role=patient" class="btn btn-secondary">
+                        <i class="fas fa-hand-holding-medical"></i>
+                        Request Blood
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="blood-drop-animation">
+                    <i class="fas fa-tint"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Blood Availability -->
+    <section class="blood-availability">
+        <div class="container">
+            <h2 class="section-title">Live Blood Availability</h2>
+            <div class="blood-cards">
+                <div class="blood-card" data-type="A+">
+                    <div class="blood-type">A+</div>
+                    <div class="blood-count">24</div>
+                    <div class="blood-status available">Available</div>
+                </div>
+                <div class="blood-card" data-type="O+">
+                    <div class="blood-type">O+</div>
+                    <div class="blood-count">18</div>
+                    <div class="blood-status available">Available</div>
+                </div>
+                <div class="blood-card" data-type="B+">
+                    <div class="blood-type">B+</div>
+                    <div class="blood-count">12</div>
+                    <div class="blood-status low">Low Stock</div>
+                </div>
+                <div class="blood-card" data-type="AB+">
+                    <div class="blood-type">AB+</div>
+                    <div class="blood-count">8</div>
+                    <div class="blood-status low">Low Stock</div>
+                </div>
+                <div class="blood-card" data-type="A-">
+                    <div class="blood-type">A-</div>
+                    <div class="blood-count">15</div>
+                    <div class="blood-status available">Available</div>
+                </div>
+                <div class="blood-card" data-type="O-">
+                    <div class="blood-type">O-</div>
+                    <div class="blood-count">6</div>
+                    <div class="blood-status critical">Critical</div>
+                </div>
+                <div class="blood-card" data-type="B-">
+                    <div class="blood-type">B-</div>
+                    <div class="blood-count">9</div>
+                    <div class="blood-status low">Low Stock</div>
+                </div>
+                <div class="blood-card" data-type="AB-">
+                    <div class="blood-type">AB-</div>
+                    <div class="blood-count">4</div>
+                    <div class="blood-status critical">Critical</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Register</h3>
+                    <p>Sign up as a donor, patient, or hospital to join our network</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Find Match</h3>
+                    <p>Our system matches donors with recipients based on blood type and location</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Save Lives</h3>
+                    <p>Complete the donation process and help save lives in your community</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-tint"></i>
+                        <span>BloodConnect</span>
+                    </div>
+                    <p>Connecting lives through blood donation. Every drop counts in saving lives.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> info@bloodconnect.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Health St, Medical City</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 BloodConnect. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
