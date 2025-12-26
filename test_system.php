@@ -182,8 +182,8 @@ $css_size = file_exists('frontend/css/style.css') ? filesize('frontend/css/style
 $js_size = file_exists('frontend/js/main.js') ? filesize('frontend/js/main.js') : 0;
 
 echo "<div class='info'>📊 Asset Information:</div>";
-echo "<p>CSS file size: " . number_format($css_size) . " bytes</p>";
-echo "<p>JS file size: " . number_format($js_size) . " bytes</p>";
+echo "<p>CSS file size: " . number_format($css_size ?? 0) . " bytes</p>";
+echo "<p>JS file size: " . number_format($js_size ?? 0) . " bytes</p>";
 
 if ($css_size > 0 && $js_size > 0) {
     echo "<div class='success'>✅ CSS and JavaScript files are present and have content!</div>";

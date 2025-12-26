@@ -29,8 +29,10 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - BloodConnect</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-styles.css">
+    <link rel="stylesheet" href="css/page-specific.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
@@ -121,28 +123,28 @@ try {
                     <div class="stat-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="stat-number"><?php echo number_format($stats['donor_count']); ?>+</div>
+                    <div class="stat-number"><?php echo number_format($stats['donor_count'] ?? 0); ?>+</div>
                     <div class="stat-label">Active Donors</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-hospital"></i>
                     </div>
-                    <div class="stat-number"><?php echo number_format($stats['hospital_count']); ?>+</div>
+                    <div class="stat-number"><?php echo number_format($stats['hospital_count'] ?? 0); ?>+</div>
                     <div class="stat-label">Partner Hospitals</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-heart"></i>
                     </div>
-                    <div class="stat-number"><?php echo number_format($stats['completed_requests']); ?>+</div>
+                    <div class="stat-number"><?php echo number_format($stats['completed_requests'] ?? 0); ?>+</div>
                     <div class="stat-label">Lives Saved</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-user-injured"></i>
                     </div>
-                    <div class="stat-number"><?php echo number_format($stats['patient_count']); ?>+</div>
+                    <div class="stat-number"><?php echo number_format($stats['patient_count'] ?? 0); ?>+</div>
                     <div class="stat-label">Registered Patients</div>
                 </div>
             </div>

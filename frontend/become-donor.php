@@ -27,8 +27,10 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Become a Donor - BloodConnect</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/modern-styles.css">
+    <link rel="stylesheet" href="css/page-specific.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
@@ -69,15 +71,15 @@ try {
                     <p>Join thousands of heroes who donate blood regularly and help save lives in their community. Your donation can save up to 3 lives!</p>
                     <div class="hero-stats">
                         <div class="stat-item">
-                            <div class="stat-number"><?php echo number_format($stats['donor_count']); ?>+</div>
+                            <div class="stat-number"><?php echo number_format($stats['donor_count'] ?? 0); ?>+</div>
                             <div class="stat-label">Active Donors</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number"><?php echo number_format($stats['completed_donations']); ?>+</div>
+                            <div class="stat-number"><?php echo number_format($stats['completed_donations'] ?? 0); ?>+</div>
                             <div class="stat-label">Donations Made</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-number"><?php echo number_format($stats['lives_saved']); ?>+</div>
+                            <div class="stat-number"><?php echo number_format($stats['lives_saved'] ?? 0); ?>+</div>
                             <div class="stat-label">Lives Saved</div>
                         </div>
                     </div>

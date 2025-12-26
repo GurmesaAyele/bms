@@ -218,7 +218,7 @@ try {
                             <i class="fas fa-user-injured"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number"><?php echo number_format($stats['patient_count']); ?></div>
+                            <div class="stat-number"><?php echo number_format($stats['patient_count'] ?? 0); ?></div>
                             <div class="stat-label">Registered Patients</div>
                         </div>
                     </div>
@@ -228,7 +228,7 @@ try {
                             <i class="fas fa-heart"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number"><?php echo number_format($stats['donor_count']); ?></div>
+                            <div class="stat-number"><?php echo number_format($stats['donor_count'] ?? 0); ?></div>
                             <div class="stat-label">Active Donors</div>
                         </div>
                     </div>
@@ -238,9 +238,9 @@ try {
                             <i class="fas fa-hospital"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number"><?php echo number_format($stats['verified_hospitals']); ?></div>
+                            <div class="stat-number"><?php echo number_format($stats['verified_hospitals'] ?? 0); ?></div>
                             <div class="stat-label">Verified Hospitals</div>
-                            <div class="stat-sub"><?php echo $stats['hospital_count'] - $stats['verified_hospitals']; ?> pending</div>
+                            <div class="stat-sub"><?php echo ($stats['hospital_count'] ?? 0) - ($stats['verified_hospitals'] ?? 0); ?> pending</div>
                         </div>
                     </div>
                     
@@ -249,9 +249,9 @@ try {
                             <i class="fas fa-hand-holding-medical"></i>
                         </div>
                         <div class="stat-content">
-                            <div class="stat-number"><?php echo number_format($stats['completed_requests']); ?></div>
+                            <div class="stat-number"><?php echo number_format($stats['completed_requests'] ?? 0); ?></div>
                             <div class="stat-label">Completed Requests</div>
-                            <div class="stat-sub"><?php echo $stats['total_requests']; ?> total</div>
+                            <div class="stat-sub"><?php echo $stats['total_requests'] ?? 0; ?> total</div>
                         </div>
                     </div>
                 </div>
