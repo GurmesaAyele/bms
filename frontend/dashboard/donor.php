@@ -103,6 +103,83 @@ if ($_POST && isset($_POST['submit_offer'])) {
     }
 }
 
+// Handle donor actions (edit, cancel, delete)
+if ($_POST && isset($_POST['donor_action']) && isset($_POST['offer_id'])) {
+    $offer_id = (int)$_POST['offer_id'];
+    $action = $_POST['donor_action'];
+    
+    try {
+        if ($action === 'cancel') {
+            // Only allow canceling pending or accepted offers
+            $stmt = $conn->prepare("
+                UPDATE donation_offers 
+                SET status = 'cancelled', updated_at = NOW()
+                WHERE id = ? AND donor_id = ? AND status IN ('pending', 'accepted')
+            ");
+            $result = $stmt->execute([$offer_id, $_SESSION['user_id']]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                $success_message = "Donation offer cancelled successfully.";
+            } else {
+                $error_message = "Cannot cancel this offer. It may have already been processed.";
+            }
+            
+        } elseif ($action === 'delete') {
+            // Only allow deleting completed, rejected, or cancelled offers
+            $stmt = $conn->prepare("
+                DELETE FROM donation_offers 
+                WHERE id = ? AND donor_id = ? AND status IN ('completed', 'rejected', 'cancelled')
+            ");
+            $result = $stmt->execute([$offer_id, $_SESSION['user_id']]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                $success_message = "Donation offer deleted from history.";
+            } else {
+                $error_message = "Cannot delete this offer. Only completed, rejected, or cancelled offers can be deleted.";
+            }
+            
+        } elseif ($action === 'edit') {
+            // Only allow editing pending offers
+            $new_date = $_POST['new_date'];
+            $new_time = $_POST['new_time'];
+            $new_notes = trim($_POST['new_notes']);
+            
+            if (empty($new_date) || empty($new_time)) {
+                $error_message = "Please provide both date and time for the update.";
+            } elseif (strtotime($new_date) < strtotime(date('Y-m-d'))) {
+                $error_message = "New date cannot be in the past.";
+            } else {
+                $stmt = $conn->prepare("
+                    UPDATE donation_offers 
+                    SET preferred_date = ?, preferred_time = ?, notes = ?, updated_at = NOW()
+                    WHERE id = ? AND donor_id = ? AND status = 'pending'
+                ");
+                $result = $stmt->execute([$new_date, $new_time, $new_notes, $offer_id, $_SESSION['user_id']]);
+                
+                if ($result && $stmt->rowCount() > 0) {
+                    $success_message = "Donation offer updated successfully.";
+                } else {
+                    $error_message = "Cannot edit this offer. Only pending offers can be modified.";
+                }
+            }
+        }
+        
+        // Redirect to prevent form resubmission
+        if (isset($success_message)) {
+            header("Location: " . $_SERVER['PHP_SELF'] . "?action_success=1");
+            exit();
+        }
+        
+    } catch (PDOException $e) {
+        $error_message = "Database error: " . $e->getMessage();
+    }
+}
+
+// Check for action success message
+if (isset($_GET['action_success'])) {
+    $success_message = "Action completed successfully!";
+}
+
 // Check for success message from redirect
 if (isset($_GET['success']) && isset($_GET['offer_id'])) {
     $success_message = "Donation offer submitted successfully! Offer ID: " . htmlspecialchars($_GET['offer_id']);
@@ -402,7 +479,93 @@ if ($user_data['last_donation_date']) {
                                             Contact Hospital
                                         </a>
                                     <?php endif; ?>
+                                    
+                                    <!-- Donor Actions based on status -->
+                                    <?php if ($offer['status'] === 'pending'): ?>
+                                        <!-- Edit Offer -->
+                                        <button class="btn-sm primary" onclick="toggleEditForm(<?php echo $offer['id']; ?>)">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        
+                                        <!-- Cancel Offer -->
+                                        <form method="POST" style="display: inline-block; margin-left: 5px;">
+                                            <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                            <input type="hidden" name="donor_action" value="cancel">
+                                            <button type="submit" class="btn-sm danger" 
+                                                    onclick="return confirm('Are you sure you want to cancel this donation offer?')">
+                                                <i class="fas fa-times"></i> Cancel
+                                            </button>
+                                        </form>
+                                        
+                                    <?php elseif ($offer['status'] === 'accepted'): ?>
+                                        <!-- Cancel Accepted Offer -->
+                                        <form method="POST" style="display: inline-block;">
+                                            <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                            <input type="hidden" name="donor_action" value="cancel">
+                                            <button type="submit" class="btn-sm warning" 
+                                                    onclick="return confirm('Are you sure you want to cancel this accepted offer? The hospital has already approved it.')">
+                                                <i class="fas fa-exclamation-triangle"></i> Cancel
+                                            </button>
+                                        </form>
+                                        
+                                    <?php elseif (in_array($offer['status'], ['completed', 'rejected', 'cancelled'])): ?>
+                                        <!-- Delete from History -->
+                                        <form method="POST" style="display: inline-block;">
+                                            <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                            <input type="hidden" name="donor_action" value="delete">
+                                            <button type="submit" class="btn-sm secondary" 
+                                                    onclick="return confirm('Are you sure you want to delete this offer from your history? This cannot be undone.')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                 </div>
+                                
+                                <!-- Edit Form (hidden by default) -->
+                                <?php if ($offer['status'] === 'pending'): ?>
+                                    <div id="edit-form-<?php echo $offer['id']; ?>" class="edit-form" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                                        <h5>Edit Donation Offer</h5>
+                                        <form method="POST">
+                                            <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                            <input type="hidden" name="donor_action" value="edit">
+                                            
+                                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                                <div style="flex: 1;">
+                                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">New Date:</label>
+                                                    <input type="date" name="new_date" value="<?php echo $offer['preferred_date']; ?>" 
+                                                           min="<?php echo date('Y-m-d'); ?>" required
+                                                           style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                                                </div>
+                                                <div style="flex: 1;">
+                                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">New Time:</label>
+                                                    <select name="new_time" required style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+                                                        <option value="09:00:00" <?php echo ($offer['preferred_time'] == '09:00:00') ? 'selected' : ''; ?>>9:00 AM</option>
+                                                        <option value="10:00:00" <?php echo ($offer['preferred_time'] == '10:00:00') ? 'selected' : ''; ?>>10:00 AM</option>
+                                                        <option value="11:00:00" <?php echo ($offer['preferred_time'] == '11:00:00') ? 'selected' : ''; ?>>11:00 AM</option>
+                                                        <option value="14:00:00" <?php echo ($offer['preferred_time'] == '14:00:00') ? 'selected' : ''; ?>>2:00 PM</option>
+                                                        <option value="15:00:00" <?php echo ($offer['preferred_time'] == '15:00:00') ? 'selected' : ''; ?>>3:00 PM</option>
+                                                        <option value="16:00:00" <?php echo ($offer['preferred_time'] == '16:00:00') ? 'selected' : ''; ?>>4:00 PM</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            
+                                            <div style="margin-bottom: 10px;">
+                                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Notes:</label>
+                                                <textarea name="new_notes" rows="2" placeholder="Updated notes..." 
+                                                          style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 3px;"><?php echo htmlspecialchars($offer['notes']); ?></textarea>
+                                            </div>
+                                            
+                                            <div style="text-align: right;">
+                                                <button type="button" class="btn-sm secondary" onclick="toggleEditForm(<?php echo $offer['id']; ?>)">
+                                                    Cancel
+                                                </button>
+                                                <button type="submit" class="btn-sm primary" style="margin-left: 5px;">
+                                                    <i class="fas fa-save"></i> Update Offer
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -518,6 +681,16 @@ if ($user_data['last_donation_date']) {
             // Just log - don't modify the button at all
             console.log('Form will submit naturally');
         });
+        
+        // Toggle edit form function
+        function toggleEditForm(offerId) {
+            const editForm = document.getElementById('edit-form-' + offerId);
+            if (editForm.style.display === 'none' || editForm.style.display === '') {
+                editForm.style.display = 'block';
+            } else {
+                editForm.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>

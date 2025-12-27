@@ -107,6 +107,19 @@ if ($_POST && isset($_POST['offer_action']) && isset($_POST['offer_id'])) {
             $donor_update->execute([$offer_id]);
             
             $success_message = "Donation completed successfully! Donor records updated.";
+        } elseif ($action === 'delete') {
+            // Allow hospitals to delete completed donations from their history
+            $stmt = $conn->prepare("
+                DELETE FROM donation_offers 
+                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?) AND status = 'completed'
+            ");
+            $result = $stmt->execute([$offer_id, $_SESSION['user_id']]);
+            
+            if ($result && $stmt->rowCount() > 0) {
+                $success_message = "Completed donation deleted from history.";
+            } else {
+                $error_message = "Cannot delete this donation. Only completed donations can be deleted.";
+            }
         }
     } catch (PDOException $e) {
         $error_message = "Failed to update donation offer status.";
@@ -167,6 +180,9 @@ try {
 // Get recent donation offers
 try {
     if ($hospital_db_id) {
+        // Debug: Add temporary debug info
+        error_log("DEBUG: Hospital DB ID = " . $hospital_db_id);
+        
         $offers_stmt = $conn->prepare("
             SELECT do.*, u.first_name, u.last_name, u.email, u.phone, d.donor_id, d.blood_type as donor_blood_type
             FROM donation_offers do
@@ -178,11 +194,29 @@ try {
         ");
         $offers_stmt->execute([$hospital_db_id]);
         $donation_offers = $offers_stmt->fetchAll();
+        
+        // Debug: Log the count
+        error_log("DEBUG: Found " . count($donation_offers) . " offers for hospital ID " . $hospital_db_id);
+        
+        // Debug: Also try to get ALL offers to see what's in the database
+        $all_offers_stmt = $conn->prepare("
+            SELECT do.offer_id, do.hospital_id, u.first_name, u.last_name
+            FROM donation_offers do
+            LEFT JOIN users u ON do.donor_id = u.id
+            ORDER BY do.created_at DESC
+            LIMIT 5
+        ");
+        $all_offers_stmt->execute();
+        $all_offers_debug = $all_offers_stmt->fetchAll();
+        error_log("DEBUG: All offers in DB: " . print_r($all_offers_debug, true));
+        
     } else {
         $donation_offers = [];
+        error_log("DEBUG: No hospital_db_id found");
     }
 } catch (PDOException $e) {
     $donation_offers = [];
+    error_log("DEBUG: Error fetching offers: " . $e->getMessage());
 }
 
 // Get blood inventory
@@ -563,6 +597,16 @@ try {
                                                 <i class="fas fa-check-circle text-success"></i>
                                                 <span>Donation completed on <?php echo date('M j, Y', strtotime($offer['completed_at'])); ?></span>
                                             </div>
+                                            
+                                            <!-- Delete Completed Donation -->
+                                            <form method="POST" style="display: inline-block; margin-top: 10px;">
+                                                <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                <input type="hidden" name="offer_action" value="delete">
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm" 
+                                                        onclick="return confirm('Are you sure you want to delete this completed donation from your records? This cannot be undone.')">
+                                                    <i class="fas fa-trash"></i> Delete from History
+                                                </button>
+                                            </form>
                                             
                                         <?php elseif ($offer['status'] === 'rejected'): ?>
                                             <div class="rejection-info">
