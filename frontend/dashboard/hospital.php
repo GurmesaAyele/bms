@@ -64,6 +64,55 @@ if ($_POST && isset($_POST['action']) && isset($_POST['request_id'])) {
     }
 }
 
+// Handle donation offer acceptance/rejection
+if ($_POST && isset($_POST['offer_action']) && isset($_POST['offer_id'])) {
+    $offer_id = (int)$_POST['offer_id'];
+    $action = $_POST['offer_action'];
+    $feedback_notes = trim($_POST['feedback_notes'] ?? '');
+    
+    try {
+        if ($action === 'accept') {
+            $stmt = $conn->prepare("
+                UPDATE donation_offers 
+                SET status = 'accepted', accepted_by = ?, accepted_at = NOW(), notes = ?
+                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+            ");
+            $stmt->execute([$_SESSION['user_id'], $feedback_notes, $offer_id, $_SESSION['user_id']]);
+            $success_message = "Donation offer accepted successfully!";
+        } elseif ($action === 'reject') {
+            $stmt = $conn->prepare("
+                UPDATE donation_offers 
+                SET status = 'rejected', accepted_by = ?, accepted_at = NOW(), notes = ?
+                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+            ");
+            $stmt->execute([$_SESSION['user_id'], $feedback_notes, $offer_id, $_SESSION['user_id']]);
+            $success_message = "Donation offer rejected.";
+        } elseif ($action === 'complete') {
+            $stmt = $conn->prepare("
+                UPDATE donation_offers 
+                SET status = 'completed', completed_at = NOW(), notes = ?
+                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+            ");
+            $stmt->execute([$feedback_notes, $offer_id, $_SESSION['user_id']]);
+            
+            // Update donor's donation count and last donation date
+            $donor_update = $conn->prepare("
+                UPDATE donors d
+                JOIN donation_offers do ON d.user_id = do.donor_id
+                SET d.total_donations = d.total_donations + 1,
+                    d.last_donation_date = CURDATE(),
+                    d.next_eligible_date = DATE_ADD(CURDATE(), INTERVAL 56 DAY)
+                WHERE do.id = ?
+            ");
+            $donor_update->execute([$offer_id]);
+            
+            $success_message = "Donation completed successfully! Donor records updated.";
+        }
+    } catch (PDOException $e) {
+        $error_message = "Failed to update donation offer status.";
+    }
+}
+
 // Get hospital statistics
 try {
     $hospital_id_stmt = $conn->prepare("SELECT id FROM hospitals WHERE user_id = ?");
@@ -444,12 +493,103 @@ try {
                                         <span><strong>Submitted:</strong> <?php echo date('M j, Y g:i A', strtotime($offer['created_at'])); ?></span>
                                         <span><strong>Contact:</strong> <?php echo htmlspecialchars($offer['phone'] ?? 'N/A'); ?></span>
                                     </div>
+                                    <div class="detail-row">
+                                        <span><strong>Email:</strong> <?php echo htmlspecialchars($offer['email'] ?? 'N/A'); ?></span>
+                                        <span><strong>Blood Type:</strong> <span class="blood-type-badge"><?php echo htmlspecialchars($offer['blood_type']); ?></span></span>
+                                    </div>
                                     <?php if ($offer['notes']): ?>
                                         <div class="notes">
-                                            <strong>Notes:</strong> <?php echo htmlspecialchars($offer['notes']); ?>
+                                            <strong>Donor Notes:</strong> <?php echo htmlspecialchars($offer['notes']); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($offer['accepted_at']): ?>
+                                        <div class="hospital-feedback">
+                                            <strong>Hospital Response:</strong> <?php echo date('M j, Y g:i A', strtotime($offer['accepted_at'])); ?>
+                                            <?php if ($offer['notes']): ?>
+                                                <br><strong>Feedback:</strong> <?php echo htmlspecialchars($offer['notes']); ?>
+                                            <?php endif; ?>
                                         </div>
                                     <?php endif; ?>
                                 </div>
+                                
+                                <?php if ($user_data['is_verified']): ?>
+                                    <div class="offer-actions">
+                                        <?php if ($offer['status'] === 'pending'): ?>
+                                            <!-- Accept Offer -->
+                                            <form method="POST" style="display: inline-block; margin-right: 10px;">
+                                                <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                <input type="hidden" name="offer_action" value="accept">
+                                                <div style="margin-bottom: 5px;">
+                                                    <input type="text" name="feedback_notes" placeholder="Acceptance message (optional)" 
+                                                           style="padding: 5px; width: 250px; border: 1px solid #ddd; border-radius: 3px;">
+                                                </div>
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-check"></i> Accept Offer
+                                                </button>
+                                            </form>
+                                            
+                                            <!-- Reject Offer -->
+                                            <form method="POST" style="display: inline-block;">
+                                                <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                <input type="hidden" name="offer_action" value="reject">
+                                                <div style="margin-bottom: 5px;">
+                                                    <input type="text" name="feedback_notes" placeholder="Reason for rejection" 
+                                                           style="padding: 5px; width: 250px; border: 1px solid #ddd; border-radius: 3px;">
+                                                </div>
+                                                <button type="submit" class="btn btn-danger btn-sm" 
+                                                        onclick="return confirm('Are you sure you want to reject this donation offer?')">
+                                                    <i class="fas fa-times"></i> Reject Offer
+                                                </button>
+                                            </form>
+                                            
+                                        <?php elseif ($offer['status'] === 'accepted'): ?>
+                                            <!-- Mark as Completed -->
+                                            <form method="POST" style="display: inline-block;">
+                                                <input type="hidden" name="offer_id" value="<?php echo $offer['id']; ?>">
+                                                <input type="hidden" name="offer_action" value="complete">
+                                                <div style="margin-bottom: 5px;">
+                                                    <input type="text" name="feedback_notes" placeholder="Completion notes (optional)" 
+                                                           style="padding: 5px; width: 250px; border: 1px solid #ddd; border-radius: 3px;">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary btn-sm" 
+                                                        onclick="return confirm('Mark this donation as completed? This will update the donor records.')">
+                                                    <i class="fas fa-check-circle"></i> Mark Completed
+                                                </button>
+                                            </form>
+                                            
+                                        <?php elseif ($offer['status'] === 'completed'): ?>
+                                            <div class="completion-info">
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                <span>Donation completed on <?php echo date('M j, Y', strtotime($offer['completed_at'])); ?></span>
+                                            </div>
+                                            
+                                        <?php elseif ($offer['status'] === 'rejected'): ?>
+                                            <div class="rejection-info">
+                                                <i class="fas fa-times-circle text-danger"></i>
+                                                <span>Offer rejected</span>
+                                            </div>
+                                        <?php endif; ?>
+                                        
+                                        <!-- Contact Donor -->
+                                        <?php if ($offer['phone']): ?>
+                                            <a href="tel:<?php echo $offer['phone']; ?>" class="btn btn-secondary btn-sm" style="margin-left: 10px;">
+                                                <i class="fas fa-phone"></i> Call Donor
+                                            </a>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($offer['email']): ?>
+                                            <a href="mailto:<?php echo $offer['email']; ?>" class="btn btn-secondary btn-sm" style="margin-left: 5px;">
+                                                <i class="fas fa-envelope"></i> Email Donor
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="verification-required">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Hospital verification required to manage donation offers.
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     </div>

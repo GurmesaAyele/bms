@@ -37,28 +37,75 @@ if ($_POST && isset($_POST['submit_offer'])) {
     $preferred_time = $_POST['preferredTime'];
     $notes = trim($_POST['notes']);
     
-    try {
-        $offer_id = 'OFF-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
-        
-        $stmt = $conn->prepare("
-            INSERT INTO donation_offers (offer_id, donor_id, hospital_id, blood_type, preferred_date, 
-                                       preferred_time, notes, status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
-        ");
-        $stmt->execute([
-            $offer_id,
-            $_SESSION['user_id'],
-            $hospital_id,
-            $user_data['blood_type'],
-            $preferred_date,
-            $preferred_time,
-            $notes
-        ]);
-        
-        $success_message = "Donation offer submitted successfully! Offer ID: " . $offer_id;
-    } catch (PDOException $e) {
-        $error_message = "Failed to submit offer. Please try again.";
+    // Validation
+    $validation_errors = [];
+    
+    if (empty($hospital_id) || $hospital_id <= 0) {
+        $validation_errors[] = "Please select a hospital.";
     }
+    
+    if (empty($preferred_date)) {
+        $validation_errors[] = "Please select a preferred date.";
+    } elseif (strtotime($preferred_date) < strtotime(date('Y-m-d'))) {
+        $validation_errors[] = "Preferred date cannot be in the past.";
+    }
+    
+    if (empty($preferred_time)) {
+        $validation_errors[] = "Please select a preferred time.";
+    }
+    
+    if (!$user_data['is_eligible']) {
+        $validation_errors[] = "You are not currently eligible to donate blood.";
+    }
+    
+    if (empty($validation_errors)) {
+        try {
+            // Check if hospital exists and is active
+            $hospital_check = $conn->prepare("SELECT id FROM hospitals WHERE id = ? AND is_verified = 1 AND is_active = 1");
+            $hospital_check->execute([$hospital_id]);
+            if (!$hospital_check->fetch()) {
+                throw new Exception("Selected hospital is not available.");
+            }
+            
+            $offer_id = 'OFF-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
+            
+            $stmt = $conn->prepare("
+                INSERT INTO donation_offers (offer_id, donor_id, hospital_id, blood_type, preferred_date, 
+                                           preferred_time, notes, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+            ");
+            $result = $stmt->execute([
+                $offer_id,
+                $_SESSION['user_id'],
+                $hospital_id,
+                $user_data['blood_type'],
+                $preferred_date,
+                $preferred_time,
+                $notes
+            ]);
+            
+            if ($result) {
+                $success_message = "Donation offer submitted successfully! Offer ID: " . $offer_id;
+                // Refresh the page to show updated offers
+                header("Location: " . $_SERVER['PHP_SELF'] . "?success=1&offer_id=" . $offer_id);
+                exit();
+            } else {
+                $error_message = "Failed to submit offer. Database error occurred.";
+            }
+            
+        } catch (PDOException $e) {
+            $error_message = "Database error: " . $e->getMessage();
+        } catch (Exception $e) {
+            $error_message = $e->getMessage();
+        }
+    } else {
+        $error_message = implode("<br>", $validation_errors);
+    }
+}
+
+// Check for success message from redirect
+if (isset($_GET['success']) && isset($_GET['offer_id'])) {
+    $success_message = "Donation offer submitted successfully! Offer ID: " . htmlspecialchars($_GET['offer_id']);
 }
 
 // Get donor's donation offers
@@ -254,14 +301,14 @@ if ($user_data['last_donation_date']) {
                     <p>Offer to donate blood at a hospital near you</p>
                 </div>
                 <div class="offer-form-container">
-                    <form class="donation-offer-form" method="POST">
+                    <form class="donation-offer-form" method="POST" id="donationOfferForm">
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Blood Type</label>
                                 <input type="text" class="form-control" value="<?php echo htmlspecialchars($user_data['blood_type']); ?>" readonly>
                             </div>
                             <div class="form-group">
-                                <label>Preferred Hospital</label>
+                                <label>Preferred Hospital <span style="color: red;">*</span></label>
                                 <select class="form-control" name="hospital" required>
                                     <option value="">Select Hospital</option>
                                     <?php foreach ($hospitals as $hospital): ?>
@@ -270,24 +317,27 @@ if ($user_data['last_donation_date']) {
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
+                                <?php if (empty($hospitals)): ?>
+                                    <small style="color: red;">No hospitals available. Please contact admin.</small>
+                                <?php endif; ?>
                             </div>
                         </div>
                         
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Preferred Date</label>
+                                <label>Preferred Date <span style="color: red;">*</span></label>
                                 <input type="date" class="form-control" name="preferredDate" min="<?php echo date('Y-m-d'); ?>" required>
                             </div>
                             <div class="form-group">
-                                <label>Preferred Time</label>
+                                <label>Preferred Time <span style="color: red;">*</span></label>
                                 <select class="form-control" name="preferredTime" required>
                                     <option value="">Select Time</option>
-                                    <option value="09:00">9:00 AM</option>
-                                    <option value="10:00">10:00 AM</option>
-                                    <option value="11:00">11:00 AM</option>
-                                    <option value="14:00">2:00 PM</option>
-                                    <option value="15:00">3:00 PM</option>
-                                    <option value="16:00">4:00 PM</option>
+                                    <option value="09:00:00">9:00 AM</option>
+                                    <option value="10:00:00">10:00 AM</option>
+                                    <option value="11:00:00">11:00 AM</option>
+                                    <option value="14:00:00">2:00 PM</option>
+                                    <option value="15:00:00">3:00 PM</option>
+                                    <option value="16:00:00">4:00 PM</option>
                                 </select>
                             </div>
                         </div>
@@ -458,6 +508,15 @@ if ($user_data['last_donation_date']) {
                     }
                 }
             });
+        });
+
+        // Form validation - no interference with submission
+        document.getElementById('donationOfferForm').addEventListener('submit', function(e) {
+            console.log('Form submission started');
+            console.log('Form data:', new FormData(this));
+            
+            // Just log - don't modify the button at all
+            console.log('Form will submit naturally');
         });
     </script>
 </body>
