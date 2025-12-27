@@ -33,50 +33,70 @@ if ($_POST && isset($_POST['submit_request'])) {
     $blood_type = $_POST['bloodType'];
     $units_requested = (int)$_POST['units'];
     $priority = $_POST['priority'];
-    $hospital_id = (int)$_POST['hospital'];
+    $hospital_id = !empty($_POST['hospital']) ? (int)$_POST['hospital'] : null;
     $medical_reason = trim($_POST['reason']);
     $doctor_contact = trim($_POST['doctorContact']);
     $emergency_contact = trim($_POST['emergencyContact']);
     
     try {
-        $request_id = 'REQ-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
+        // Get patient ID from patients table
+        $patient_stmt = $conn->prepare("SELECT id FROM patients WHERE user_id = ?");
+        $patient_stmt->execute([$_SESSION['user_id']]);
+        $patient_record = $patient_stmt->fetch();
         
-        $stmt = $conn->prepare("
-            INSERT INTO blood_requests (request_id, patient_id, hospital_id, blood_type, units_requested, 
-                                      priority, medical_reason, doctor_contact, emergency_contact_name, 
-                                      status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
-        ");
-        $stmt->execute([
-            $request_id,
-            $user_data['id'],
-            $hospital_id,
-            $blood_type,
-            $units_requested,
-            $priority,
-            $medical_reason,
-            $doctor_contact,
-            $emergency_contact
-        ]);
-        
-        $success_message = "Blood request submitted successfully! Request ID: " . $request_id;
+        if ($patient_record) {
+            $request_id = 'REQ-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
+            
+            $stmt = $conn->prepare("
+                INSERT INTO blood_requests (request_id, patient_id, assigned_hospital_id, blood_type, units_requested, 
+                                          priority, medical_reason, doctor_contact, emergency_contact_name, 
+                                          requested_by_user_id, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+            ");
+            $stmt->execute([
+                $request_id,
+                $patient_record['id'],
+                $hospital_id,
+                $blood_type,
+                $units_requested,
+                $priority,
+                $medical_reason,
+                $doctor_contact,
+                $emergency_contact,
+                $_SESSION['user_id']
+            ]);
+            
+            $success_message = "Blood request submitted successfully! Request ID: " . $request_id;
+        } else {
+            $error_message = "Patient record not found. Please complete your patient registration.";
+        }
     } catch (PDOException $e) {
-        $error_message = "Failed to submit request. Please try again.";
+        $error_message = "Failed to submit request. Please try again. Error: " . $e->getMessage();
     }
 }
 
 // Get patient's blood requests
 try {
-    $requests_stmt = $conn->prepare("
-        SELECT br.*, h.hospital_name, h.emergency_phone as hospital_phone
-        FROM blood_requests br
-        LEFT JOIN hospitals h ON br.hospital_id = h.id
-        WHERE br.patient_id = ?
-        ORDER BY br.created_at DESC
-        LIMIT 10
-    ");
-    $requests_stmt->execute([$_SESSION['user_id']]);
-    $blood_requests = $requests_stmt->fetchAll();
+    // First get the patient ID from the patients table
+    $patient_stmt = $conn->prepare("SELECT id FROM patients WHERE user_id = ?");
+    $patient_stmt->execute([$_SESSION['user_id']]);
+    $patient_record = $patient_stmt->fetch();
+    
+    if ($patient_record) {
+        $requests_stmt = $conn->prepare("
+            SELECT br.*, h.hospital_name, u.phone as hospital_phone
+            FROM blood_requests br
+            LEFT JOIN hospitals h ON br.assigned_hospital_id = h.id
+            LEFT JOIN users u ON h.user_id = u.id
+            WHERE br.patient_id = ?
+            ORDER BY br.created_at DESC
+            LIMIT 10
+        ");
+        $requests_stmt->execute([$patient_record['id']]);
+        $blood_requests = $requests_stmt->fetchAll();
+    } else {
+        $blood_requests = [];
+    }
 } catch (PDOException $e) {
     $blood_requests = [];
 }
@@ -426,8 +446,14 @@ if (isset($_GET['search_blood']) && !empty($_GET['blood_type'])) {
             <!-- Request Status Tracking -->
             <div class="request-status-section" id="requests">
                 <div class="card-header">
-                    <h3>My Blood Requests</h3>
-                    <span class="badge info"><?php echo count($blood_requests); ?> requests</span>
+                    <h3>My Blood Requests History</h3>
+                    <div class="header-actions">
+                        <span class="badge info"><?php echo count($blood_requests); ?> total requests</span>
+                        <a href="../request-blood.php" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i>
+                            New Request
+                        </a>
+                    </div>
                 </div>
                 <div class="requests-timeline">
                     <?php if (empty($blood_requests)): ?>
@@ -435,36 +461,162 @@ if (isset($_GET['search_blood']) && !empty($_GET['blood_type'])) {
                             <i class="fas fa-clipboard-list"></i>
                             <h4>No Blood Requests</h4>
                             <p>You haven't submitted any blood requests yet.</p>
+                            <a href="../request-blood.php" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i>
+                                Submit Your First Request
+                            </a>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($blood_requests as $request): ?>
-                            <div class="request-item <?php echo $request['status']; ?>">
-                                <div class="request-status-indicator <?php echo $request['status']; ?>">
-                                    <i class="fas <?php echo ($request['status'] == 'pending') ? 'fa-clock' : (($request['status'] == 'approved') ? 'fa-check' : (($request['status'] == 'completed') ? 'fa-check-circle' : 'fa-times-circle')); ?>"></i>
+                        <div class="requests-summary">
+                            <?php
+                            $status_counts = array_count_values(array_column($blood_requests, 'status'));
+                            ?>
+                            <div class="summary-stats">
+                                <div class="stat-item pending">
+                                    <span class="count"><?php echo $status_counts['pending'] ?? 0; ?></span>
+                                    <span class="label">Pending</span>
                                 </div>
-                                <div class="request-details">
-                                    <div class="request-header">
-                                        <h4><?php echo htmlspecialchars($request['blood_type']); ?> Blood Request</h4>
-                                        <span class="request-id">#<?php echo htmlspecialchars($request['request_id']); ?></span>
-                                    </div>
-                                    <div class="request-info">
-                                        <p><strong>Units:</strong> <?php echo $request['units_requested']; ?> units</p>
-                                        <p><strong>Priority:</strong> <?php echo ucfirst($request['priority']); ?></p>
-                                        <p><strong>Hospital:</strong> <?php echo htmlspecialchars($request['hospital_name'] ?? 'Hospital'); ?></p>
-                                        <p><strong>Submitted:</strong> <?php echo date('M j, Y g:i A', strtotime($request['created_at'])); ?></p>
-                                        <p><strong>Status:</strong> <span class="status-badge <?php echo $request['status']; ?>"><?php echo ucfirst($request['status']); ?></span></p>
-                                    </div>
+                                <div class="stat-item approved">
+                                    <span class="count"><?php echo $status_counts['approved'] ?? 0; ?></span>
+                                    <span class="label">Approved</span>
                                 </div>
-                                <div class="request-actions">
-                                    <?php if ($request['hospital_phone']): ?>
-                                        <a href="tel:<?php echo $request['hospital_phone']; ?>" class="btn-sm secondary">
-                                            <i class="fas fa-phone"></i>
-                                            Contact Hospital
-                                        </a>
-                                    <?php endif; ?>
+                                <div class="stat-item completed">
+                                    <span class="count"><?php echo $status_counts['completed'] ?? 0; ?></span>
+                                    <span class="label">Completed</span>
+                                </div>
+                                <div class="stat-item rejected">
+                                    <span class="count"><?php echo $status_counts['rejected'] ?? 0; ?></span>
+                                    <span class="label">Rejected</span>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
+                        </div>
+                        
+                        <div class="requests-list">
+                            <?php foreach ($blood_requests as $index => $request): ?>
+                                <div class="request-item <?php echo $request['status']; ?>" data-request-id="<?php echo $request['id']; ?>">
+                                    <div class="request-timeline-indicator">
+                                        <div class="timeline-dot <?php echo $request['status']; ?>">
+                                            <i class="fas <?php 
+                                                echo ($request['status'] == 'pending') ? 'fa-clock' : 
+                                                     (($request['status'] == 'approved') ? 'fa-check' : 
+                                                      (($request['status'] == 'completed') ? 'fa-check-circle' : 
+                                                       (($request['status'] == 'rejected') ? 'fa-times-circle' : 'fa-question-circle'))); 
+                                            ?>"></i>
+                                        </div>
+                                        <?php if ($index < count($blood_requests) - 1): ?>
+                                            <div class="timeline-line"></div>
+                                        <?php endif; ?>
+                                    </div>
+                                    
+                                    <div class="request-content">
+                                        <div class="request-header">
+                                            <div class="request-title">
+                                                <h4>
+                                                    <span class="blood-type-badge <?php echo strtolower(str_replace(['+', '-'], ['pos', 'neg'], $request['blood_type'])); ?>">
+                                                        <?php echo htmlspecialchars($request['blood_type']); ?>
+                                                    </span>
+                                                    Blood Request
+                                                </h4>
+                                                <span class="request-id">#<?php echo htmlspecialchars($request['request_id']); ?></span>
+                                            </div>
+                                            <div class="request-status">
+                                                <span class="status-badge <?php echo $request['status']; ?>">
+                                                    <?php echo ucfirst($request['status']); ?>
+                                                </span>
+                                                <span class="priority-badge <?php echo $request['priority']; ?>">
+                                                    <?php echo ucfirst($request['priority']); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="request-details">
+                                            <div class="detail-grid">
+                                                <div class="detail-item">
+                                                    <i class="fas fa-tint"></i>
+                                                    <span class="label">Units Requested:</span>
+                                                    <span class="value"><?php echo $request['units_requested']; ?> units</span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <i class="fas fa-hospital"></i>
+                                                    <span class="label">Hospital:</span>
+                                                    <span class="value"><?php echo htmlspecialchars($request['hospital_name'] ?? 'Any Hospital'); ?></span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <i class="fas fa-calendar"></i>
+                                                    <span class="label">Submitted:</span>
+                                                    <span class="value"><?php echo date('M j, Y g:i A', strtotime($request['created_at'])); ?></span>
+                                                </div>
+                                                <div class="detail-item">
+                                                    <i class="fas fa-user-md"></i>
+                                                    <span class="label">Doctor Contact:</span>
+                                                    <span class="value"><?php echo htmlspecialchars($request['doctor_contact'] ?? 'Not provided'); ?></span>
+                                                </div>
+                                            </div>
+                                            
+                                            <?php if (!empty($request['medical_reason'])): ?>
+                                                <div class="medical-reason">
+                                                    <i class="fas fa-notes-medical"></i>
+                                                    <span class="label">Medical Reason:</span>
+                                                    <p class="reason-text"><?php echo htmlspecialchars($request['medical_reason']); ?></p>
+                                                </div>
+                                            <?php endif; ?>
+                                            
+                                            <?php if ($request['status'] == 'approved' && !empty($request['approved_at'])): ?>
+                                                <div class="status-update approved">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    <span>Approved on <?php echo date('M j, Y g:i A', strtotime($request['approved_at'])); ?></span>
+                                                </div>
+                                            <?php elseif ($request['status'] == 'completed' && !empty($request['completed_at'])): ?>
+                                                <div class="status-update completed">
+                                                    <i class="fas fa-check-double"></i>
+                                                    <span>Completed on <?php echo date('M j, Y g:i A', strtotime($request['completed_at'])); ?></span>
+                                                </div>
+                                            <?php elseif ($request['status'] == 'rejected'): ?>
+                                                <div class="status-update rejected">
+                                                    <i class="fas fa-times-circle"></i>
+                                                    <span>Request was rejected</span>
+                                                    <?php if (!empty($request['rejection_reason'])): ?>
+                                                        <p class="rejection-reason">Reason: <?php echo htmlspecialchars($request['rejection_reason']); ?></p>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        
+                                        <div class="request-actions">
+                                            <?php if ($request['status'] == 'pending'): ?>
+                                                <span class="action-note">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    Your request is being processed
+                                                </span>
+                                            <?php endif; ?>
+                                            
+                                            <?php if ($request['hospital_phone']): ?>
+                                                <a href="tel:<?php echo $request['hospital_phone']; ?>" class="btn-sm secondary">
+                                                    <i class="fas fa-phone"></i>
+                                                    Contact Hospital
+                                                </a>
+                                            <?php endif; ?>
+                                            
+                                            <?php if ($request['status'] == 'rejected'): ?>
+                                                <a href="../request-blood.php" class="btn-sm primary">
+                                                    <i class="fas fa-redo"></i>
+                                                    Submit New Request
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        
+                        <?php if (count($blood_requests) >= 10): ?>
+                            <div class="load-more-section">
+                                <button class="btn btn-outline-primary" onclick="loadMoreRequests()">
+                                    <i class="fas fa-chevron-down"></i>
+                                    Load More Requests
+                                </button>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -561,6 +713,33 @@ if (isset($_GET['search_blood']) && !empty($_GET['blood_type'])) {
                 }
             });
         });
+        
+        // Load more requests function
+        function loadMoreRequests() {
+            // This would typically make an AJAX call to load more requests
+            // For now, just show a message
+            alert('Load more functionality would be implemented here with AJAX');
+        }
+        
+        // Auto-refresh request status every 30 seconds
+        setInterval(function() {
+            // This would check for status updates
+            // For now, just add a subtle animation to pending requests
+            document.querySelectorAll('.request-item.pending .timeline-dot').forEach(dot => {
+                dot.style.animation = 'pulse 2s infinite';
+            });
+        }, 30000);
+        
+        // Add pulse animation for pending requests
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>

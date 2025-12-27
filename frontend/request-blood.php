@@ -11,49 +11,72 @@ if ($_POST && isset($_POST['submit_request'])) {
     if (!isset($_SESSION['user_id'])) {
         $error_message = 'Please login to submit a blood request.';
     } else {
-        $blood_type = $_POST['bloodType'];
-        $units_requested = (int)$_POST['unitsRequested'];
-        $priority = $_POST['priority'];
-        $medical_reason = trim($_POST['medicalReason']);
-        $hospital_id = $_POST['hospitalId'] ?? null;
-        $doctor_contact = trim($_POST['doctorContact']);
-        $emergency_contact = trim($_POST['emergencyContact']);
-        
-        // Validation
-        if (empty($blood_type) || empty($units_requested) || empty($priority) || empty($medical_reason)) {
-            $error_message = 'Please fill in all required fields.';
-        } elseif ($units_requested < 1 || $units_requested > 10) {
-            $error_message = 'Units requested must be between 1 and 10.';
-        } else {
+        // Check if user is a patient or get patient ID
+        $patient_id = null;
+        if ($_SESSION['user_type'] == 'patient') {
+            // Get patient ID from patients table
             try {
-                // Generate request ID
-                $request_id = 'REQ-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
-                
-                // Insert blood request
-                $stmt = $conn->prepare("
-                    INSERT INTO blood_requests (request_id, patient_id, hospital_id, blood_type, units_requested, 
-                                              priority, medical_reason, doctor_contact, emergency_contact_name, 
-                                              status, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
-                ");
-                $stmt->execute([
-                    $request_id,
-                    $_SESSION['user_id'],
-                    $hospital_id,
-                    $blood_type,
-                    $units_requested,
-                    $priority,
-                    $medical_reason,
-                    $doctor_contact,
-                    $emergency_contact
-                ]);
-                
-                $success_message = "Blood request submitted successfully! Request ID: $request_id. You will be notified when a match is found.";
-                
-                // Clear form data
-                $_POST = array();
+                $patient_stmt = $conn->prepare("SELECT id FROM patients WHERE user_id = ?");
+                $patient_stmt->execute([$_SESSION['user_id']]);
+                $patient_record = $patient_stmt->fetch();
+                if ($patient_record) {
+                    $patient_id = $patient_record['id'];
+                } else {
+                    $error_message = 'Patient record not found. Please complete your patient registration.';
+                }
             } catch (PDOException $e) {
-                $error_message = 'Failed to submit request. Please try again.';
+                $error_message = 'Error verifying patient status. Please try again.';
+            }
+        } else {
+            $error_message = 'Only registered patients can submit blood requests. Please register as a patient first.';
+        }
+        
+        if (!$error_message && $patient_id) {
+            $blood_type = $_POST['bloodType'];
+            $units_requested = (int)$_POST['unitsRequested'];
+            $priority = $_POST['priority'];
+            $medical_reason = trim($_POST['medicalReason']);
+            $hospital_id = !empty($_POST['hospitalId']) ? $_POST['hospitalId'] : null;
+            $doctor_contact = trim($_POST['doctorContact']);
+            $emergency_contact = trim($_POST['emergencyContact']);
+            
+            // Validation
+            if (empty($blood_type) || empty($units_requested) || empty($priority) || empty($medical_reason)) {
+                $error_message = 'Please fill in all required fields.';
+            } elseif ($units_requested < 1 || $units_requested > 10) {
+                $error_message = 'Units requested must be between 1 and 10.';
+            } else {
+                try {
+                    // Generate request ID
+                    $request_id = 'REQ-' . date('Y') . '-' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
+                    
+                    // Insert blood request
+                    $stmt = $conn->prepare("
+                        INSERT INTO blood_requests (request_id, patient_id, assigned_hospital_id, blood_type, units_requested, 
+                                                  priority, medical_reason, doctor_contact, emergency_contact_name, 
+                                                  requested_by_user_id, status, created_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())
+                    ");
+                    $stmt->execute([
+                        $request_id,
+                        $patient_id,
+                        $hospital_id,
+                        $blood_type,
+                        $units_requested,
+                        $priority,
+                        $medical_reason,
+                        $doctor_contact,
+                        $emergency_contact,
+                        $_SESSION['user_id']
+                    ]);
+                    
+                    $success_message = "Blood request submitted successfully! Request ID: $request_id. You will be notified when a match is found.";
+                    
+                    // Clear form data
+                    $_POST = array();
+                } catch (PDOException $e) {
+                    $error_message = 'Failed to submit request. Please try again. Error: ' . $e->getMessage();
+                }
             }
         }
     }

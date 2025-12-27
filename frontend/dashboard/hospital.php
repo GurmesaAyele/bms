@@ -45,22 +45,30 @@ if ($_POST && isset($_POST['action']) && isset($_POST['request_id'])) {
         if ($action === 'approve') {
             $stmt = $conn->prepare("
                 UPDATE blood_requests 
-                SET status = 'approved', approved_by = ?, approved_at = NOW(), notes = ?
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+                SET status = 'approved', approved_by_user_id = ?, approved_at = NOW(), rejection_notes = ?
+                WHERE id = ? AND assigned_hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
             ");
             $stmt->execute([$_SESSION['user_id'], $notes, $request_id, $_SESSION['user_id']]);
             $success_message = "Blood request approved successfully!";
         } elseif ($action === 'reject') {
             $stmt = $conn->prepare("
                 UPDATE blood_requests 
-                SET status = 'rejected', approved_by = ?, approved_at = NOW(), notes = ?
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+                SET status = 'rejected', rejected_by_user_id = ?, rejected_at = NOW(), rejection_reason = ?, rejection_notes = ?
+                WHERE id = ? AND assigned_hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
             ");
-            $stmt->execute([$_SESSION['user_id'], $notes, $request_id, $_SESSION['user_id']]);
+            $stmt->execute([$_SESSION['user_id'], $notes, $notes, $request_id, $_SESSION['user_id']]);
             $success_message = "Blood request rejected.";
+        } elseif ($action === 'complete') {
+            $stmt = $conn->prepare("
+                UPDATE blood_requests 
+                SET status = 'completed', completed_at = NOW(), rejection_notes = ?
+                WHERE id = ? AND assigned_hospital_id = (SELECT id FROM hospitals WHERE user_id = ?) AND status = 'approved'
+            ");
+            $stmt->execute([$notes, $request_id, $_SESSION['user_id']]);
+            $success_message = "Blood request marked as completed!";
         }
     } catch (PDOException $e) {
-        $error_message = "Failed to update request status.";
+        $error_message = "Failed to update request status: " . $e->getMessage();
     }
 }
 
@@ -72,48 +80,37 @@ if ($_POST && isset($_POST['offer_action']) && isset($_POST['offer_id'])) {
     
     try {
         if ($action === 'accept') {
+            // Use only the columns that exist in your table
             $stmt = $conn->prepare("
                 UPDATE donation_offers 
                 SET status = 'accepted', accepted_by = ?, accepted_at = NOW(), notes = ?
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+                WHERE id = ? AND hospital_id = ?
             ");
-            $stmt->execute([$_SESSION['user_id'], $feedback_notes, $offer_id, $_SESSION['user_id']]);
+            $stmt->execute([$_SESSION['user_id'], $feedback_notes, $offer_id, $hospital_db_id]);
             $success_message = "Donation offer accepted successfully!";
         } elseif ($action === 'reject') {
             $stmt = $conn->prepare("
                 UPDATE donation_offers 
-                SET status = 'rejected', accepted_by = ?, accepted_at = NOW(), notes = ?
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+                SET status = 'rejected', notes = ?
+                WHERE id = ? AND hospital_id = ?
             ");
-            $stmt->execute([$_SESSION['user_id'], $feedback_notes, $offer_id, $_SESSION['user_id']]);
+            $stmt->execute([$feedback_notes, $offer_id, $hospital_db_id]);
             $success_message = "Donation offer rejected.";
         } elseif ($action === 'complete') {
             $stmt = $conn->prepare("
                 UPDATE donation_offers 
                 SET status = 'completed', completed_at = NOW(), notes = ?
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?)
+                WHERE id = ? AND hospital_id = ?
             ");
-            $stmt->execute([$feedback_notes, $offer_id, $_SESSION['user_id']]);
-            
-            // Update donor's donation count and last donation date
-            $donor_update = $conn->prepare("
-                UPDATE donors d
-                JOIN donation_offers do ON d.user_id = do.donor_id
-                SET d.total_donations = d.total_donations + 1,
-                    d.last_donation_date = CURDATE(),
-                    d.next_eligible_date = DATE_ADD(CURDATE(), INTERVAL 56 DAY)
-                WHERE do.id = ?
-            ");
-            $donor_update->execute([$offer_id]);
-            
-            $success_message = "Donation completed successfully! Donor records updated.";
+            $stmt->execute([$feedback_notes, $offer_id, $hospital_db_id]);
+            $success_message = "Donation completed successfully!";
         } elseif ($action === 'delete') {
             // Allow hospitals to delete completed donations from their history
             $stmt = $conn->prepare("
                 DELETE FROM donation_offers 
-                WHERE id = ? AND hospital_id = (SELECT id FROM hospitals WHERE user_id = ?) AND status = 'completed'
+                WHERE id = ? AND hospital_id = ? AND status = 'completed'
             ");
-            $result = $stmt->execute([$offer_id, $_SESSION['user_id']]);
+            $result = $stmt->execute([$offer_id, $hospital_db_id]);
             
             if ($result && $stmt->rowCount() > 0) {
                 $success_message = "Completed donation deleted from history.";
@@ -122,7 +119,7 @@ if ($_POST && isset($_POST['offer_action']) && isset($_POST['offer_id'])) {
             }
         }
     } catch (PDOException $e) {
-        $error_message = "Failed to update donation offer status.";
+        $error_message = "Failed to update donation offer status: " . $e->getMessage();
     }
 }
 
@@ -135,10 +132,10 @@ try {
     
     $stats_stmt = $conn->prepare("
         SELECT 
-            (SELECT COUNT(*) FROM blood_requests WHERE hospital_id = ?) as total_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE hospital_id = ? AND status = 'pending') as pending_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE hospital_id = ? AND status = 'approved') as approved_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE hospital_id = ? AND status = 'completed') as completed_requests,
+            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ?) as total_requests,
+            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'pending') as pending_requests,
+            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'approved') as approved_requests,
+            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'completed') as completed_requests,
             (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ?) as total_offers,
             (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ? AND status = 'pending') as pending_offers
     ");
@@ -162,9 +159,9 @@ try {
         $requests_stmt = $conn->prepare("
             SELECT br.*, u.first_name, u.last_name, u.email, u.phone, p.patient_id, p.blood_type as patient_blood_type
             FROM blood_requests br
-            JOIN users u ON br.patient_id = u.id
-            LEFT JOIN patients p ON u.id = p.user_id
-            WHERE br.hospital_id = ?
+            JOIN patients p ON br.patient_id = p.id
+            JOIN users u ON p.user_id = u.id
+            WHERE br.assigned_hospital_id = ?
             ORDER BY br.created_at DESC
             LIMIT 10
         ");
@@ -180,43 +177,22 @@ try {
 // Get recent donation offers
 try {
     if ($hospital_db_id) {
-        // Debug: Add temporary debug info
-        error_log("DEBUG: Hospital DB ID = " . $hospital_db_id);
-        
+        // Use the correct query for your donation_offers table structure
         $offers_stmt = $conn->prepare("
-            SELECT do.*, u.first_name, u.last_name, u.email, u.phone, d.donor_id, d.blood_type as donor_blood_type
+            SELECT do.*, u.first_name, u.last_name, u.email, u.phone
             FROM donation_offers do
-            JOIN users u ON do.donor_id = u.id
-            LEFT JOIN donors d ON u.id = d.user_id
+            LEFT JOIN users u ON do.donor_id = u.id
             WHERE do.hospital_id = ?
             ORDER BY do.created_at DESC
             LIMIT 10
         ");
         $offers_stmt->execute([$hospital_db_id]);
         $donation_offers = $offers_stmt->fetchAll();
-        
-        // Debug: Log the count
-        error_log("DEBUG: Found " . count($donation_offers) . " offers for hospital ID " . $hospital_db_id);
-        
-        // Debug: Also try to get ALL offers to see what's in the database
-        $all_offers_stmt = $conn->prepare("
-            SELECT do.offer_id, do.hospital_id, u.first_name, u.last_name
-            FROM donation_offers do
-            LEFT JOIN users u ON do.donor_id = u.id
-            ORDER BY do.created_at DESC
-            LIMIT 5
-        ");
-        $all_offers_stmt->execute();
-        $all_offers_debug = $all_offers_stmt->fetchAll();
-        error_log("DEBUG: All offers in DB: " . print_r($all_offers_debug, true));
-        
     } else {
         $donation_offers = [];
-        error_log("DEBUG: No hospital_db_id found");
     }
 } catch (PDOException $e) {
     $donation_offers = [];
-    error_log("DEBUG: Error fetching offers: " . $e->getMessage());
 }
 
 // Get blood inventory
@@ -457,9 +433,9 @@ try {
                                     <div class="medical-reason">
                                         <strong>Medical Reason:</strong> <?php echo htmlspecialchars($request['medical_reason']); ?>
                                     </div>
-                                    <?php if ($request['notes']): ?>
+                                    <?php if ($request['rejection_notes']): ?>
                                         <div class="notes">
-                                            <strong>Notes:</strong> <?php echo htmlspecialchars($request['notes']); ?>
+                                            <strong>Hospital Notes:</strong> <?php echo htmlspecialchars($request['rejection_notes']); ?>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -482,6 +458,30 @@ try {
                                                 <i class="fas fa-times"></i> Reject
                                             </button>
                                         </form>
+                                    </div>
+                                <?php elseif ($request['status'] === 'approved' && $user_data['is_verified']): ?>
+                                    <div class="request-actions">
+                                        <form method="POST" style="display: inline;">
+                                            <input type="hidden" name="request_id" value="<?php echo $request['id']; ?>">
+                                            <input type="hidden" name="action" value="complete">
+                                            <input type="text" name="notes" placeholder="Completion notes (optional)" style="margin-right: 10px; padding: 5px;">
+                                            <button type="submit" class="btn btn-primary btn-sm" onclick="return confirm('Mark this blood request as completed?')">
+                                                <i class="fas fa-check-circle"></i> Mark Completed
+                                            </button>
+                                        </form>
+                                    </div>
+                                <?php elseif ($request['status'] === 'completed'): ?>
+                                    <div class="completion-info">
+                                        <i class="fas fa-check-circle text-success"></i>
+                                        <span>Request completed on <?php echo date('M j, Y', strtotime($request['completed_at'])); ?></span>
+                                    </div>
+                                <?php elseif ($request['status'] === 'rejected'): ?>
+                                    <div class="rejection-info">
+                                        <i class="fas fa-times-circle text-danger"></i>
+                                        <span>Request rejected</span>
+                                        <?php if ($request['rejection_reason']): ?>
+                                            <br><small>Reason: <?php echo htmlspecialchars($request['rejection_reason']); ?></small>
+                                        <?php endif; ?>
                                     </div>
                                 <?php endif; ?>
                             </div>
@@ -509,7 +509,7 @@ try {
                             <div class="offer-card <?php echo $offer['status']; ?>">
                                 <div class="offer-header">
                                     <div class="offer-info">
-                                        <h4><?php echo htmlspecialchars($offer['blood_type']); ?> Blood Donation</h4>
+                                        <h4><?php echo htmlspecialchars($offer['blood_type'] ?? 'Unknown'); ?> Blood Donation</h4>
                                         <p><strong>Donor:</strong> <?php echo htmlspecialchars($offer['first_name'] . ' ' . $offer['last_name']); ?></p>
                                         <p><strong>Offer ID:</strong> <?php echo htmlspecialchars($offer['offer_id']); ?></p>
                                     </div>
@@ -529,7 +529,7 @@ try {
                                     </div>
                                     <div class="detail-row">
                                         <span><strong>Email:</strong> <?php echo htmlspecialchars($offer['email'] ?? 'N/A'); ?></span>
-                                        <span><strong>Blood Type:</strong> <span class="blood-type-badge"><?php echo htmlspecialchars($offer['blood_type']); ?></span></span>
+                                        <span><strong>Blood Type:</strong> <span class="blood-type-badge"><?php echo htmlspecialchars($offer['blood_type'] ?? 'Unknown'); ?></span></span>
                                     </div>
                                     <?php if ($offer['notes']): ?>
                                         <div class="notes">
