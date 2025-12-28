@@ -30,6 +30,16 @@ try {
     die("Error loading user data: " . $e->getMessage());
 }
 
+// Get hospital database ID for use throughout the script
+try {
+    $hospital_id_stmt = $conn->prepare("SELECT id FROM hospitals WHERE user_id = ?");
+    $hospital_id_stmt->execute([$_SESSION['user_id']]);
+    $hospital_record = $hospital_id_stmt->fetch();
+    $hospital_db_id = $hospital_record ? $hospital_record['id'] : null;
+} catch (PDOException $e) {
+    $hospital_db_id = null;
+}
+
 // Check if hospital is verified
 if (!$user_data['is_verified']) {
     $verification_message = "Your hospital account is pending admin approval. You will have limited access until verified.";
@@ -125,22 +135,21 @@ if ($_POST && isset($_POST['offer_action']) && isset($_POST['offer_id'])) {
 
 // Get hospital statistics
 try {
-    $hospital_id_stmt = $conn->prepare("SELECT id FROM hospitals WHERE user_id = ?");
-    $hospital_id_stmt->execute([$_SESSION['user_id']]);
-    $hospital_record = $hospital_id_stmt->fetch();
-    $hospital_db_id = $hospital_record['id'];
-    
-    $stats_stmt = $conn->prepare("
-        SELECT 
-            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ?) as total_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'pending') as pending_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'approved') as approved_requests,
-            (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'completed') as completed_requests,
-            (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ?) as total_offers,
-            (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ? AND status = 'pending') as pending_offers
-    ");
-    $stats_stmt->execute([$hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id]);
-    $stats = $stats_stmt->fetch();
+    if ($hospital_db_id) {
+        $stats_stmt = $conn->prepare("
+            SELECT 
+                (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ?) as total_requests,
+                (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'pending') as pending_requests,
+                (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'approved') as approved_requests,
+                (SELECT COUNT(*) FROM blood_requests WHERE assigned_hospital_id = ? AND status = 'completed') as completed_requests,
+                (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ?) as total_offers,
+                (SELECT COUNT(*) FROM donation_offers WHERE hospital_id = ? AND status = 'pending') as pending_offers
+        ");
+        $stats_stmt->execute([$hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id, $hospital_db_id]);
+        $stats = $stats_stmt->fetch();
+    } else {
+        throw new Exception("Hospital ID not found");
+    }
 } catch (PDOException $e) {
     $stats = [
         'total_requests' => 0,
@@ -150,7 +159,6 @@ try {
         'total_offers' => 0,
         'pending_offers' => 0
     ];
-    $hospital_db_id = null;
 }
 
 // Get recent blood requests
