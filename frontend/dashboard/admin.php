@@ -413,27 +413,40 @@ try {
             font-weight: 600;
         }
 
-        /* Chart Container */
+        /* Chart Container - OPTIMIZED SIZE */
         .chart-container {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 15px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             border: 2px solid #f1f5f9;
             margin-bottom: 2rem;
+            max-height: 400px;
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .chart-title {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: #1e293b;
+        }
+
+        /* Chart Canvas - FIXED HEIGHT */
+        #registrationChart {
+            max-height: 280px !important;
+            width: 100% !important;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 280px;
+            width: 100%;
         }
 
         /* Tab Container */
@@ -690,6 +703,24 @@ try {
                 padding: 1.5rem;
             }
 
+            /* MOBILE CHART OPTIMIZATION */
+            .chart-container {
+                padding: 1rem;
+                max-height: 320px;
+            }
+
+            .chart-wrapper {
+                height: 220px;
+            }
+
+            #registrationChart {
+                max-height: 220px !important;
+            }
+
+            .chart-title {
+                font-size: 1rem;
+            }
+
             .tab-nav {
                 flex-direction: column;
             }
@@ -728,7 +759,26 @@ try {
                 grid-template-columns: 1fr;
             }
 
-            .chart-container,
+            /* ULTRA COMPACT CHART FOR MOBILE */
+            .chart-container {
+                margin: 0 -1rem;
+                border-radius: 0;
+                padding: 0.8rem;
+                max-height: 280px;
+            }
+
+            .chart-wrapper {
+                height: 180px;
+            }
+
+            #registrationChart {
+                max-height: 180px !important;
+            }
+
+            .chart-title {
+                font-size: 0.9rem;
+            }
+
             .tab-container {
                 margin: 0 -1rem;
                 border-radius: 0;
@@ -828,12 +878,14 @@ try {
             </div>
         </div>
 
-        <!-- Real-time Chart -->
+        <!-- Real-time Chart - OPTIMIZED SIZE -->
         <div class="chart-container">
             <div class="chart-header">
                 <h3 class="chart-title">User Registration Trends (Last 7 Days)</h3>
             </div>
-            <canvas id="registrationChart" width="400" height="200"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="registrationChart"></canvas>
+            </div>
         </div>
 
         <!-- Tab Container -->
@@ -988,45 +1040,77 @@ try {
                         data: patientsData,
                         borderColor: '#dc2626',
                         backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                        borderWidth: 3,
+                        borderWidth: 2,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     },
                     {
                         label: 'Donors',
                         data: donorsData,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 3,
+                        borderWidth: 2,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     },
                     {
                         label: 'Hospitals',
                         data: hospitalsData,
                         borderColor: '#0ea5e9',
                         backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                        borderWidth: 3,
+                        borderWidth: 2,
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 10,
+                        bottom: 10,
+                        left: 10,
+                        right: 10
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'top',
+                        align: 'center',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
+                            padding: 15,
+                            boxWidth: 12,
+                            boxHeight: 12,
                             font: {
                                 family: 'Inter',
-                                size: 12,
+                                size: 11,
                                 weight: '600'
                             }
                         }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleFont: {
+                            family: 'Inter',
+                            size: 12,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            family: 'Inter',
+                            size: 11
+                        },
+                        cornerRadius: 8,
+                        displayColors: true,
+                        boxPadding: 4
                     }
                 },
                 scales: {
@@ -1034,30 +1118,53 @@ try {
                         beginAtZero: true,
                         ticks: {
                             stepSize: 1,
+                            maxTicksLimit: 6,
                             font: {
-                                family: 'Inter'
-                            }
+                                family: 'Inter',
+                                size: 10
+                            },
+                            color: '#64748b'
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
                         }
                     },
                     x: {
                         ticks: {
+                            maxTicksLimit: 7,
                             font: {
-                                family: 'Inter'
-                            }
+                                family: 'Inter',
+                                size: 10
+                            },
+                            color: '#64748b'
                         },
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawBorder: false
+                        },
+                        border: {
+                            display: false
                         }
                     }
                 },
                 elements: {
                     point: {
-                        radius: 6,
-                        hoverRadius: 8
+                        radius: 4,
+                        hoverRadius: 6,
+                        borderWidth: 2,
+                        hoverBorderWidth: 3
+                    },
+                    line: {
+                        borderWidth: 2
                     }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
                 }
             }
         });

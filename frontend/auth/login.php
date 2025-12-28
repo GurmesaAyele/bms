@@ -5,6 +5,19 @@ require_once '../../backend/config/database.php';
 $error_message = '';
 $success_message = '';
 
+// Handle admin bypass
+if ($_POST && isset($_POST['admin_bypass'])) {
+    // Create admin session directly
+    $_SESSION['user_id'] = 1; // Assuming admin user ID is 1
+    $_SESSION['user_email'] = 'admin@bloodconnect.com';
+    $_SESSION['user_type'] = 'admin';
+    $_SESSION['user_name'] = 'System Administrator';
+    
+    // Redirect to admin dashboard
+    header('Location: ../dashboard/admin.php');
+    exit();
+}
+
 // Handle login form submission
 if ($_POST && isset($_POST['email']) && isset($_POST['password'])) {
     $email = trim($_POST['email']);
@@ -66,6 +79,263 @@ if ($_POST && isset($_POST['email']) && isset($_POST['password'])) {
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CRITICAL: Override all external CSS with maximum specificity */
+        body.login-page .login-container {
+            min-height: 100vh !important;
+            display: flex !important;
+            align-items: flex-start !important;
+            justify-content: center !important;
+            padding: 1rem !important;
+            padding-top: 2rem !important;
+        }
+
+        body.login-page .login-card {
+            max-height: none !important;
+            height: auto !important;
+            overflow: visible !important;
+            padding: 1rem !important;
+            margin: 0 auto !important;
+            max-width: 400px !important;
+            width: 100% !important;
+            position: relative !important;
+            z-index: 999 !important;
+        }
+
+        /* ULTRA COMPACT LAYOUT */
+        body.login-page .logo {
+            margin-bottom: 0.3rem !important;
+            text-align: center !important;
+        }
+
+        body.login-page .logo h1 {
+            margin: 0.2rem 0 0 0 !important;
+            font-size: 1.4rem !important;
+            line-height: 1 !important;
+        }
+
+        body.login-page .logo-icon {
+            margin-bottom: 0.2rem !important;
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 1.2rem !important;
+        }
+
+        body.login-page .welcome {
+            margin-bottom: 0.5rem !important;
+            text-align: center !important;
+        }
+
+        body.login-page .welcome h2 {
+            margin: 0 !important;
+            font-size: 1.1rem !important;
+            line-height: 1 !important;
+        }
+
+        body.login-page .welcome h2::after {
+            display: none !important;
+        }
+
+        /* FORM COMPRESSION */
+        body.login-page .login-form {
+            margin-bottom: 0.5rem !important;
+        }
+
+        body.login-page .input-group {
+            margin-bottom: 0.5rem !important;
+        }
+
+        body.login-page .input-wrapper input {
+            padding: 0.6rem 0.8rem 0.6rem 2.2rem !important;
+            font-size: 0.9rem !important;
+        }
+
+        body.login-page .input-wrapper i {
+            left: 0.8rem !important;
+            font-size: 0.9rem !important;
+        }
+
+        body.login-page .login-btn {
+            margin: 0.3rem 0 !important;
+            padding: 0.7rem !important;
+            font-size: 0.9rem !important;
+        }
+
+        /* ALERT COMPRESSION */
+        body.login-page .alert {
+            margin-bottom: 0.5rem !important;
+            padding: 0.5rem 0.8rem !important;
+            font-size: 0.8rem !important;
+        }
+
+        /* ADMIN BUTTON - MAXIMUM VISIBILITY */
+        body.login-page .admin-access {
+            margin: 0.5rem 0 !important;
+            position: relative !important;
+            z-index: 9999 !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            padding: 0.5rem !important;
+            border-radius: 8px !important;
+            border: 2px solid #dc2626 !important;
+        }
+
+        body.login-page .divider {
+            text-align: center !important;
+            margin: 0.3rem 0 !important;
+            position: relative !important;
+            display: block !important;
+        }
+
+        body.login-page .divider::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 1px !important;
+            background: #dc2626 !important;
+        }
+
+        body.login-page .divider span {
+            background: white !important;
+            padding: 0 0.5rem !important;
+            color: #dc2626 !important;
+            font-size: 0.7rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+        }
+
+        body.login-page .admin-btn {
+            width: 100% !important;
+            padding: 0.8rem !important;
+            background: linear-gradient(135deg, #dc2626, #7f1d1d) !important;
+            color: white !important;
+            border: 3px solid #dc2626 !important;
+            border-radius: 8px !important;
+            font-family: inherit !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 0.5rem !important;
+            position: relative !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4) !important;
+            font-size: 0.9rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            z-index: 9999 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        body.login-page .admin-btn:hover {
+            background: linear-gradient(135deg, #7f1d1d, #450a0a) !important;
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6) !important;
+            border-color: #7f1d1d !important;
+        }
+
+        body.login-page .admin-btn i {
+            font-size: 1rem !important;
+            color: white !important;
+        }
+
+        body.login-page .admin-btn span {
+            font-weight: 700 !important;
+            font-size: 0.9rem !important;
+            color: white !important;
+        }
+
+        /* REMOVE OVERLAPPING SMALL TEXT */
+        body.login-page .admin-btn small {
+            display: none !important;
+        }
+
+        /* REGISTER SECTION COMPRESSION */
+        body.login-page .register-section {
+            margin-top: 0.5rem !important;
+        }
+
+        body.login-page .register-section p {
+            margin-bottom: 0.3rem !important;
+            font-size: 0.8rem !important;
+        }
+
+        body.login-page .register-options {
+            gap: 0.3rem !important;
+        }
+
+        body.login-page .register-btn {
+            padding: 0.5rem 0.6rem !important;
+            font-size: 0.7rem !important;
+        }
+
+        body.login-page .register-btn i {
+            font-size: 0.9rem !important;
+        }
+
+        /* FORCE VISIBILITY ON ALL ELEMENTS */
+        body.login-page .admin-access,
+        body.login-page .admin-access *,
+        body.login-page .divider,
+        body.login-page .divider *,
+        body.login-page .admin-btn,
+        body.login-page .admin-btn * {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            z-index: 9999 !important;
+        }
+
+        body.login-page .admin-btn {
+            display: flex !important;
+        }
+
+        /* MOBILE ULTRA COMPACT */
+        @media (max-width: 768px) {
+            body.login-page .login-container {
+                padding: 0.5rem !important;
+                padding-top: 1rem !important;
+            }
+            
+            body.login-page .login-card {
+                padding: 0.8rem !important;
+                margin: 0 auto !important;
+            }
+            
+            body.login-page .logo h1 {
+                font-size: 1.2rem !important;
+            }
+            
+            body.login-page .welcome h2 {
+                font-size: 1rem !important;
+            }
+            
+            body.login-page .admin-btn {
+                padding: 0.7rem !important;
+                font-size: 0.8rem !important;
+            }
+        }
+
+        /* OVERRIDE ANY CONFLICTING STYLES */
+        body.login-page * {
+            line-height: 1.2 !important;
+        }
+
+        /* ENSURE ADMIN SECTION IS ALWAYS VISIBLE */
+        body.login-page .admin-access {
+            min-height: 60px !important;
+            background: rgba(220, 38, 38, 0.1) !important;
+        }
+    </style>
 </head>
 <body class="login-page">
     <!-- Home Button -->
@@ -137,6 +407,20 @@ if ($_POST && isset($_POST['email']) && isset($_POST['password'])) {
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </form>
+
+            <!-- Admin Quick Access - BELOW SIGN IN BUTTON -->
+            <div class="admin-access">
+                <div class="divider">
+                    <span>Quick Access</span>
+                </div>
+                <form method="POST" style="margin: 0;">
+                    <input type="hidden" name="admin_bypass" value="1">
+                    <button type="submit" class="admin-btn">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin Dashboard</span>
+                    </button>
+                </form>
+            </div>
 
             <!-- Register Options -->
             <div class="register-section">
