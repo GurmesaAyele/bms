@@ -161,16 +161,17 @@ try {
 
         /* Dashboard Navigation */
         .dashboard-nav {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #dc2626, #7f1d1d, #450a0a);
             color: white;
             padding: 1rem 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
             position: sticky;
             top: 0;
             z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 3px solid #fca5a5;
         }
 
         .nav-brand {
@@ -184,6 +185,13 @@ try {
         .nav-brand i {
             font-size: 1.8rem;
             color: #fecaca;
+            text-shadow: 0 0 20px rgba(254, 202, 202, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .nav-user {
@@ -247,13 +255,15 @@ try {
 
         /* Admin Header */
         .admin-header {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #dc2626, #7f1d1d, #450a0a);
             color: white;
             padding: 2rem;
-            border-radius: 15px;
+            border-radius: 20px;
             margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+            border: 2px solid rgba(254, 202, 202, 0.2);
         }
 
         .admin-header::before {
@@ -261,11 +271,26 @@ try {
             position: absolute;
             top: 0;
             right: 0;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(254, 202, 202, 0.15) 0%, transparent 70%);
             border-radius: 50%;
-            transform: translate(50%, -50%);
+            transform: translate(30%, -30%);
+        }
+
+        .admin-header::after {
+            content: '⚕️';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 3rem;
+            opacity: 0.1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         .admin-title {

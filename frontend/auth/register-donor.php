@@ -103,18 +103,435 @@ if ($_POST) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donor Registration - BloodConnect</title>
-    <link rel="stylesheet" href="../css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+            background: linear-gradient(135deg, #fef2f2, #fee2e2, #fecaca);
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: linear-gradient(135deg, #dc2626, #7f1d1d, #450a0a);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 8px 32px rgba(220, 38, 38, 0.3);
+            border-bottom: 3px solid #fca5a5;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #fecaca;
+            text-shadow: 0 0 20px rgba(254, 202, 202, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Registration Container */
+        .auth-container-modern {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .auth-content-modern {
+            display: flex;
+            justify-content: center;
+        }
+
+        .auth-card-modern {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.15);
+            border: 2px solid rgba(254, 202, 202, 0.3);
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        .auth-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #dc2626, #7f1d1d, #450a0a);
+        }
+
+        .auth-header-modern {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(135deg, #fef2f2, #fee2e2);
+            position: relative;
+        }
+
+        .auth-header-modern::after {
+            content: '🩸';
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .auth-logo-modern {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #dc2626, #7f1d1d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);
+            border: 3px solid rgba(254, 202, 202, 0.5);
+        }
+
+        .auth-logo-modern i {
+            font-size: 2rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-header-modern h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #7f1d1d;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-header-modern p {
+            color: #64748b;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            border: 2px solid;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2, #fca5a5);
+            color: #991b1b;
+            border-color: #f87171;
+        }
+
+        /* Form */
+        .auth-form-modern {
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #fefefe, #f8fafc);
+            border-radius: 15px;
+            border: 2px solid #f1f5f9;
+            position: relative;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #dc2626, #7f1d1d);
+            border-radius: 2px;
+        }
+
+        .form-section h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #7f1d1d;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section h3 i {
+            color: #dc2626;
+            font-size: 1.2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group-modern {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group-modern label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .form-control-modern {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+
+        .form-control-modern:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        /* Checkbox */
+        .checkbox-label-modern {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #374151;
+            padding: 0.75rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-label-modern:hover {
+            background: #f8fafc;
+        }
+
+        .checkbox-label-modern input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #dc2626;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            text-transform: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #dc2626, #7f1d1d);
+            color: white;
+            border: 2px solid transparent;
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #7f1d1d, #450a0a);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn-lg {
+            padding: 1.25rem 2.5rem;
+            font-size: 1.2rem;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .auth-btn-modern {
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        .auth-footer-modern {
+            text-align: center;
+            padding: 2rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .auth-footer-modern p {
+            margin-bottom: 0.5rem;
+            color: #64748b;
+        }
+
+        .auth-link-modern {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-link-modern:hover {
+            color: #7f1d1d;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .auth-container-modern {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .auth-header-modern {
+                padding: 2rem 1rem 1.5rem;
+            }
+
+            .auth-header-modern h1 {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .auth-form-modern {
+                padding: 1.5rem;
+            }
+
+            .form-section {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-header-modern h1 {
+                font-size: 1.75rem;
+            }
+
+            .btn-lg {
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
-<body class="auth-body">
+<<body>
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
-            <div class="nav-brand">
+            <a href="../index.php" class="nav-brand">
                 <i class="fas fa-tint"></i>
                 <span>BloodConnect</span>
-            </div>
+            </a>
             <div class="nav-menu">
                 <a href="../index.php" class="nav-link">Home</a>
                 <a href="../about.php" class="nav-link">About</a>
@@ -322,6 +739,53 @@ if ($_POST) {
         </div>
     </div>
 
-    <script src="../js/main.js"></script>
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.auth-form-modern');
+            const inputs = form.querySelectorAll('.form-control-modern');
+            
+            // Add floating label effect
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (!this.value) {
+                        this.parentElement.classList.remove('focused');
+                    }
+                });
+                
+                // Check if input has value on load
+                if (input.value) {
+                    input.parentElement.classList.add('focused');
+                }
+            });
+            
+            // Blood type selection enhancement
+            const bloodTypeSelect = document.getElementById('bloodType');
+            if (bloodTypeSelect) {
+                bloodTypeSelect.addEventListener('change', function() {
+                    if (this.value) {
+                        this.style.background = 'linear-gradient(135deg, #fee2e2, #fecaca)';
+                        this.style.color = '#7f1d1d';
+                        this.style.fontWeight = '600';
+                    } else {
+                        this.style.background = 'white';
+                        this.style.color = '#1e293b';
+                        this.style.fontWeight = 'normal';
+                    }
+                });
+            }
+            
+            // Form submission enhancement
+            form.addEventListener('submit', function(e) {
+                const submitBtn = form.querySelector('.btn-primary');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
 </body>
 </html>
