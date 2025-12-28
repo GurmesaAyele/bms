@@ -253,13 +253,6 @@ if ($user_data['last_donation_date']) {
                 <i class="fas fa-heart"></i>
             </div>
             <div class="nav-actions">
-                <button class="btn-icon" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge"><?php echo count($donation_offers); ?></span>
-                </button>
-                <button class="btn-icon" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <a href="../auth/logout.php" class="btn-icon" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>

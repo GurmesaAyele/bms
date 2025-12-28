@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - BloodConnect</title>
+    <link rel="stylesheet" href="frontend/css/login.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="login-logo">
+                <i class="fas fa-tint"></i>
+            </div>
+            <h1 class="login-title">Welcome Back! 🩸</h1>
+            <p class="login-subtitle">Join thousands of heroes saving lives every day</p>
+            <div class="welcome-stats">
+                <div class="stat-item">
+                    <span class="stat-number">25K+</span>
+                    <span class="stat-label">Lives Saved</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">10K+</span>
+                    <span class="stat-label">Heroes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">500+</span>
+                    <span class="stat-label">Hospitals</span>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" action="">
+            <div class="form-group">
+                <input type="email" name="email" class="form-control" placeholder="Enter your email address" required>
+            </div>
+
+            <div class="form-group">
+                <div class="password-field">
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="password-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+            </button>
+        </form>
+
+        <div class="divider">
+            <span>✨ New to our life-saving community? ✨</span>
+        </div>
+
+        <div class="register-options">
+            <a href="#" class="register-btn">
+                <i class="fas fa-user"></i>
+                Need Blood
+            </a>
+            <a href="#" class="register-btn">
+                <i class="fas fa-heart"></i>
+                Donate Blood
+            </a>
+            <a href="#" class="register-btn">
+                <i class="fas fa-hospital"></i>
+                Hospital
+            </a>
+        </div>
+
+        <div class="home-section">
+            <a href="#" class="home-btn">
+                <i class="fas fa-home"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordField = document.getElementById('password');
+            const passwordIcon = document.getElementById('password-icon');
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                passwordIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordField.type = 'password';
+                passwordIcon.className = 'fas fa-eye';
+            }
+        }
+
+        // Add entrance animation
+        window.addEventListener('load', function() {
+            const container = document.querySelector('.login-container');
+            setTimeout(() => {
+                container.classList.add('loaded');
+            }, 100);
+        });
+    </script>
+</body>
+</html>

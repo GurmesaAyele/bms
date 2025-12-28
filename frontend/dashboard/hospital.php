@@ -239,13 +239,6 @@ try {
                 <i class="fas fa-hospital"></i>
             </div>
             <div class="nav-actions">
-                <button class="btn-icon" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge"><?php echo $stats['pending_requests'] + $stats['pending_offers']; ?></span>
-                </button>
-                <button class="btn-icon" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <a href="../auth/logout.php" class="btn-icon" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>

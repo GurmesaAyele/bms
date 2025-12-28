@@ -174,13 +174,6 @@ if (isset($_GET['search_blood']) && !empty($_GET['blood_type'])) {
                 <i class="fas fa-user-injured"></i>
             </div>
             <div class="nav-actions">
-                <button class="btn-icon" title="Notifications">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge"><?php echo count($blood_requests); ?></span>
-                </button>
-                <button class="btn-icon" title="Settings">
-                    <i class="fas fa-cog"></i>
-                </button>
                 <a href="../auth/logout.php" class="btn-icon" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </a>
